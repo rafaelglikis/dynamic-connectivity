@@ -1,17 +1,27 @@
 #ifndef DYNAMIC_CONNECTIVITY_DYNAMICGRAPH_H
 #define DYNAMIC_CONNECTIVITY_DYNAMICGRAPH_H
 
-#include <LEDA/graph/graph.h>
+#include <boost/graph/adjacency_list.hpp>
 
-class DynamicGraph
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, boost::no_property> UndirectedGraph;
+typedef boost::graph_traits<UndirectedGraph>::vertex_descriptor Vertex;
+typedef boost::graph_traits<UndirectedGraph>::edge_descriptor Edge;
+typedef boost::graph_traits<UndirectedGraph>::vertex_iterator VertexIterator;
+typedef boost::graph_traits<UndirectedGraph>::edge_iterator EdgeIterator;
+typedef boost::graph_traits<UndirectedGraph>::out_edge_iterator OutEdgeIterator;
+
+
+class DynamicGraph : public UndirectedGraph
 {
 private:
-    leda::graph* G;
+    std::vector<int> components;
+    int nextComponent = 0;
+    void dfsUpdateComponent(const long& s);
 
 public:
-    explicit DynamicGraph(leda::graph &g);
+    void visualize();
+    void init();
 
-    void del_edge(leda::edge e);
 };
 
 

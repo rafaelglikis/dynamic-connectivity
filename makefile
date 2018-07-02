@@ -7,7 +7,7 @@ TARGET=bdbfs
 
 
 all:
-	$(CC) main.cpp -o $(TARGET) $(CFLAGS) 
+	$(CC) main.cpp src/* -o $(TARGET) $(CFLAGS) 
 	
 info:
 	$(CC) main.cpp -o $(TARGET) $(CFLAGS) -D INFO=1
