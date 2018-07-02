@@ -7,4 +7,4 @@ set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_CXX_FLAGS "-lleda -lX11")
 
-add_executable(dynamic_connectivity main.cpp)
+add_executable(dynamic_connectivity main.cpp src/DynamicGraph.cpp incl/DynamicGraph.h)
