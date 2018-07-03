@@ -8,7 +8,7 @@ void DynamicGraph::visualize()
     // Creating components streams
     std::vector<std::ostringstream> subgraphs(this->nextComponent);
     for(unsigned long i = 0; i<this->nextComponent; ++i) {
-        subgraphs[i] << "  subgraph cluster" << i << " { ";
+        subgraphs[i] << "  subgraph cluster" << i << " { label = \"Component " << i+1 << "\" ";
     }
     for(unsigned long i = 0; i<this->components.size(); ++i) {
         subgraphs[components[i]-1] << i << "; ";
