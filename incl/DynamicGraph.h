@@ -13,7 +13,7 @@ typedef boost::graph_traits<UndirectedGraph>::out_edge_iterator OutEdgeIterator;
 
 struct relatives {
     std::list<Edge> a_pred_edges;
-    std::list<Edge> b_siblings_edges;
+    std::list<Edge> b_sibl_edges;
     std::list<Edge> c_succ_edges;
 };
 
@@ -23,14 +23,20 @@ private:
     std::vector<unsigned long> components;
     std::vector<int> dist;
     std::vector<relatives> relEdges;
+    std::list<Edge> virtualEdges;
     unsigned long nextComponent = 0;
-    void dfs(const unsigned long &);
+
+    bool breaksComponent(const Vertex&, const Vertex&);
     void bfs(const Vertex&);
+    void updateRelEdges();
+    void hideVirtualEdges();
 
 public:
-    void visualize();
     void init();
-
+    bool areConnected(const Vertex&, const Vertex&);
+    void deleteEdge(const Vertex&, const Vertex&);
+    void visualize();
+    void printInfo();
 };
 
 
