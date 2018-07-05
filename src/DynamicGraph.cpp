@@ -350,16 +350,11 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
     }
 }
 
-void DynamicGraph::visualize() const
-{
-    this->visualize(false);
-}
-
 /**
  * Prints graph in GraphViz
  * https://dreampuf.github.io/GraphvizOnline/
  */
-void DynamicGraph::visualize(bool printVirtualEdges) const
+void DynamicGraph::visualize() const
 {
     // Creating components streams
     std::vector<std::ostringstream> subgraphs(this->nextComponent);
@@ -386,7 +381,6 @@ void DynamicGraph::visualize(bool printVirtualEdges) const
     // Print edges
     EdgeIterator ei, ei_end;
     for (tie(ei, ei_end) = edges(*this); ei != ei_end; ++ei) {
-        if (virtualEdges.count(*ei) && !printVirtualEdges) continue;
         Vertex u,v;
         Edge e = *ei;
         u = source(e, *this);

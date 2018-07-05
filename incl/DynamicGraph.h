@@ -34,7 +34,6 @@ public:
 
     // Printers
     void visualize() const;
-    void visualize(bool) const;
     void printInfo() const;
 };
 

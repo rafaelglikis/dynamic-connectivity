@@ -52,7 +52,7 @@ int main()
     //G.deleteEdge(14, 13);
     //G.deleteEdge(14, 15);
 
-    G.visualize(true);
+    G.visualize();
 //    std::cout << G.areConnected(0,9) << std::endl;
 //    std::cout << G.areConnected(0,1) << std::endl;
 
