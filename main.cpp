@@ -36,10 +36,11 @@ int main()
 
 //    G.visualize();
 
-    G.deleteEdge(1, 0);
-//    G.visualize();
+    G.deleteEdge(10, 12);
 
-    G.printInfo();
+    G.visualize();
+
+//    G.printInfo();
 //    std::cout << G.areConnected(0,9) << std::endl;
 //    std::cout << G.areConnected(0,1) << std::endl;
 

@@ -11,7 +11,6 @@ void DynamicGraph::init()
     this->relatives.resize(num_vertices(*this));
 
     bfs(0);
-    this->hideVirtualEdges();
     this->updateRelatives();
 }
 
@@ -50,7 +49,7 @@ void DynamicGraph::bfs(const Vertex& s)
         for(Vertex i=1; i<dist.size(); ++i ) {
             if(!visited[i]){
                 boost::add_edge(0, i, *this);
-                this->virtualEdges.push_back(edge(0,i,*this).first);
+                this->virtualEdges.insert(edge(0,i,*this).first);
 
                 this->nextComponent++;
                 visited[i]=true;
@@ -115,8 +114,8 @@ void DynamicGraph::deleteEdge(const Vertex &v, const Vertex &u)
     bool edgeExist = edge(v,u,*this).second;
     if (edgeExist) {
         Edge e = edge(v,u,*this).first;
-        this->handleDeletion(v, u);
         boost::remove_edge(e, *this);
+        this->handleDeletion(v, u);
     }
     else {
         throw std::invalid_argument("Edge does not exist");
@@ -125,12 +124,13 @@ void DynamicGraph::deleteEdge(const Vertex &v, const Vertex &u)
 
 void DynamicGraph::handleDeletion(const Vertex &v, const Vertex &u)
 {
+    this->halt = false;
     #pragma omp parallel sections
     {
         #pragma omp section
         {
             // Component Not Break
-            checkComponentNotBreak(v, u);
+            //checkComponentNotBreak(v, u);
         }
 
         #pragma omp section
@@ -139,13 +139,11 @@ void DynamicGraph::handleDeletion(const Vertex &v, const Vertex &u)
             checkComponentBreak(v, u);
         }
     }
-
-    this->halt = false;
 }
 
 bool DynamicGraph::checkComponentBreak(const Vertex &v, const Vertex &u)
 {
-    // Using parallel DFS
+    // Using parallel BFS
     std::list<Vertex> queueV;
     std::list<Vertex> queueU;
     std::vector<bool> visitedV(boost::num_vertices(*this), false);
@@ -154,59 +152,66 @@ bool DynamicGraph::checkComponentBreak(const Vertex &v, const Vertex &u)
     std::list<Vertex> visitedListU;
 
     visitedV[v]=true;
-    queueV.push_front(v);
-    visitedListV.push_front(v);
-
     visitedU[u]=true;
-    queueU.push_front(u);
-    visitedListU.push_front(v);
 
-    while(!this->halt) {
+    queueV.push_back(v);
+    queueU.push_back(u);
 
+    visitedListV.push_back(v);
+    visitedListU.push_back(u);
+
+    while(!queueV.empty() && !queueU.empty()) {
         OutEdgeIterator ei, ei_end;
 
         Vertex vv = queueV.front();
         visitedV[vv]=true;
         queueV.pop_front();
-        for(boost::tie(ei, ei_end) = out_edges(vv, *this); ei != ei_end; ++ei) {
-            Vertex vvTarget = target(*ei, *this);
-            if (u == vvTarget) return false;
-            if(!visitedV[vvTarget]){
-                queueV.push_front(vvTarget);
-                visitedListV.push_front(vvTarget);
-            }
-        }
-
-        if (queueV.empty()) {
-            updateVisitedComponents(visitedListV);
-            #pragma omp critical
-            {
-                this->halt = true;
-            }
-            return true;
-        }
 
         Vertex uu = queueU.front();
         visitedU[uu]=true;
         queueU.pop_front();
-        for(boost::tie(ei, ei_end) = out_edges(uu, *this); ei != ei_end; ++ei) {
-            Vertex uuTarget = target(*ei, *this);
-            if (v == uuTarget) return false;
-            if(!visitedU[uuTarget]) {
-                queueU.push_front(uuTarget);
-                visitedListU.push_front(uuTarget);
+
+        for(boost::tie(ei, ei_end) = out_edges(vv, *this); ei != ei_end; ++ei) {
+            Vertex vvTarget = target(*ei, *this);
+            if(!visitedV[vvTarget] && !virtualEdges.count(*ei)){
+                queueV.push_back(vvTarget);
+                visitedListV.push_back(vvTarget);
+            }
+            else if (u == vvTarget) {
+                return false;
             }
         }
 
-        if (queueU.empty()) {
-            updateVisitedComponents(visitedListU);
-            #pragma omp critical
-            {
-                this->halt = true;
+        for(boost::tie(ei, ei_end) = out_edges(uu, *this); ei != ei_end; ++ei) {
+            Vertex uuTarget = target(*ei, *this);
+            if(!visitedU[uuTarget] && !virtualEdges.count(*ei)) {
+                queueU.push_back(uuTarget);
+                visitedListU.push_back(uuTarget);
             }
-            return true;
+            else if (v == uuTarget) {
+                return false;
+            }
+        }
+
+        if (this->halt) {
+            return false;
         }
     }
+
+    #pragma omp critical
+    {
+        this->halt = true;
+    }
+
+    if (queueV.empty()) {
+        updateVisitedComponents(visitedListV);
+    }
+
+    if (queueU.empty()) {
+        updateVisitedComponents(visitedListU);
+    }
+
+    return true;
 }
 
 void DynamicGraph::updateVisitedComponents(std::list<Vertex>& visited)
@@ -322,6 +327,7 @@ void DynamicGraph::visualize()
     // Print edges
     EdgeIterator ei, ei_end;
     for (tie(ei, ei_end) = edges(*this); ei != ei_end; ++ei) {
+        if (virtualEdges.count(*ei)) continue;
         Vertex u,v;
         Edge e = *ei;
         u = source(e, *this);

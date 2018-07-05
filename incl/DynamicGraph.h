@@ -2,6 +2,7 @@
 #define DYNAMIC_CONNECTIVITY_DYNAMICGRAPH_H
 
 #include <boost/graph/adjacency_list.hpp>
+#include <unordered_set>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
         boost::no_property, boost::no_property, boost::no_property,
@@ -24,16 +25,18 @@ private:
     std::vector<unsigned long> components;
     std::vector<int> dist;
     std::vector<Relatives> relatives;
-    std::list<Edge> virtualEdges;
+    std::set<Edge> virtualEdges;
     unsigned long nextComponent = 0;
     bool halt = false;
 
     // Initialization Operations
     void bfs(const Vertex&);
     void updateRelatives();
-    void hideVirtualEdges();
 
     // Deletion operations
+    void hideVirtualEdges();
+    void showVirtualEdges();
+
     void handleDeletion(const Vertex&, const Vertex&);
     bool checkComponentBreak(const Vertex &, const Vertex &);
     void updateVisitedComponents(std::list<Vertex>&);
