@@ -10,11 +10,11 @@ void DynamicGraph::init()
     this->dist.resize(num_vertices(*this));
     this->relatives.resize(num_vertices(*this));
 
-    bfs(0);
+    buildBFSStructure(0);
     this->updateRelatives();
 }
 
-void DynamicGraph::bfs(const Vertex& s)
+void DynamicGraph::buildBFSStructure(const Vertex &s)
 {
     std::list<Vertex> queue;
     std::vector<bool> visited(boost::num_vertices(*this));
@@ -99,8 +99,18 @@ void DynamicGraph::updateRelatives()
 
 void DynamicGraph::hideVirtualEdges()
 {
-    for(auto ve = this->virtualEdges.begin(); ve != virtualEdges.end(); ++ve) {
-        boost::remove_edge(*ve, *this);
+    for(auto ei = this->virtualEdges.begin(); ei != virtualEdges.end(); ++ei) {
+        Edge e = *ei;
+        boost::remove_edge(*ei, *this);
+    }
+}
+
+void DynamicGraph::showVirtualEdges()
+{
+    for(auto ei = this->virtualEdges.begin(); ei != virtualEdges.end(); ++ei) {
+        Vertex s = source(*ei, *this);
+        Vertex t = target(*ei, *this);
+        boost::add_edge(s, t, *this);
     }
 }
 
@@ -130,7 +140,7 @@ void DynamicGraph::handleDeletion(const Vertex &v, const Vertex &u)
         #pragma omp section
         {
             // Component Not Break
-            //checkComponentNotBreak(v, u);
+            checkComponentNotBreak(v, u);
         }
 
         #pragma omp section
@@ -350,21 +360,32 @@ void DynamicGraph::printInfo()
         std::cout << " - dist " << this->dist[v] << std::endl;
         std::cout << " - pred: ";
         for (auto ei = this->relatives[v].a_pred.begin(); ei != this->relatives[v].a_pred.end(); ei++) {
+            if(this->virtualEdges.count(*ei)) {
+                std::cout << "~";
+            }
             std::cout << *ei << " ";
         }
         std::cout << std::endl;
         std::cout << " - sibl: ";
         for (auto ei = this->relatives[v].b_sibl.begin(); ei != this->relatives[v].b_sibl.end(); ei++) {
+            if(this->virtualEdges.count(*ei)) {
+                std::cout << "~";
+            }
             std::cout << *ei << " ";
         }
         std::cout << std::endl;
         std::cout << " - succ: ";
         for (auto ei = this->relatives[v].c_succ.begin(); ei != this->relatives[v].c_succ.end(); ei++) {
+            if(this->virtualEdges.count(*ei)) {
+                std::cout << "~";
+            }
             std::cout << *ei << " ";
         }
         std::cout << std::endl;
     }
 }
+
+
 
 
 

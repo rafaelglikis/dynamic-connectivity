@@ -40,11 +40,8 @@ int main()
 
     G.visualize();
 
-//    G.printInfo();
 //    std::cout << G.areConnected(0,9) << std::endl;
 //    std::cout << G.areConnected(0,1) << std::endl;
-
-
 
     return 0;
 }
