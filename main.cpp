@@ -34,12 +34,12 @@ int main()
 
     G.init();
 
-    G.visualize();
+//    G.visualize();
 
-    G.deleteEdge(10,12);
-    G.visualize();
+    G.deleteEdge(1, 0);
+//    G.visualize();
 
-//    G.printInfo();
+    G.printInfo();
 //    std::cout << G.areConnected(0,9) << std::endl;
 //    std::cout << G.areConnected(0,1) << std::endl;
 

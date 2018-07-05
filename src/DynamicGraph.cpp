@@ -2,20 +2,23 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
+#include <omp.h>
 
-void DynamicGraph::init() {
+void DynamicGraph::init()
+{
     this->components.resize(num_vertices(*this));
     this->dist.resize(num_vertices(*this));
-    this->relEdges.resize(num_vertices(*this));
+    this->relatives.resize(num_vertices(*this));
 
     bfs(0);
     this->hideVirtualEdges();
-    this->updateRelEdges();
+    this->updateRelatives();
 }
 
-void DynamicGraph::bfs(const Vertex& s) {
+void DynamicGraph::bfs(const Vertex& s)
+{
     std::list<Vertex> queue;
-    std::vector<Vertex> visited(boost::num_vertices(*this));
+    std::vector<bool> visited(boost::num_vertices(*this));
     this->nextComponent++;
 
     visited[s]=true;
@@ -39,6 +42,8 @@ void DynamicGraph::bfs(const Vertex& s) {
             }
         }
     }
+
+
 
     while(std::find(visited.begin(), visited.end(), 0) != visited.end() ) {
         // Add Virtual Edges
@@ -74,67 +79,90 @@ void DynamicGraph::bfs(const Vertex& s) {
     }
 }
 
-void DynamicGraph::updateRelEdges() {
+void DynamicGraph::updateRelatives()
+{
     for(Vertex v = 0; v < this->dist.size(); v++) {
         OutEdgeIterator ei, ei_end;
         for(boost::tie(ei, ei_end) = out_edges(v, *this); ei != ei_end; ++ei) {
             Vertex u = target(*ei, *this);
             if(this->dist[v] == this->dist[u] + 1 ) {
-                this->relEdges[v].a_pred_edges.push_back(*ei);
+                this->relatives[v].a_pred.insert(*ei);
             }
             else if(this->dist[v] == this->dist[u]) {
-                this->relEdges[v].b_sibl_edges.push_back(*ei);
+                this->relatives[v].b_sibl.insert(*ei);
             }
             else if(this->dist[v] == this->dist[u] - 1 ) {
-                this->relEdges[v].c_succ_edges.push_back(*ei);
+                this->relatives[v].c_succ.insert(*ei);
             }
         }
     }
 }
 
-void DynamicGraph::hideVirtualEdges() {
+void DynamicGraph::hideVirtualEdges()
+{
     for(auto ve = this->virtualEdges.begin(); ve != virtualEdges.end(); ++ve) {
         boost::remove_edge(*ve, *this);
     }
 }
 
-bool DynamicGraph::areConnected(const Vertex &v, const Vertex &u) {
+bool DynamicGraph::areConnected(const Vertex &v, const Vertex &u)
+{
     return this->components[v] == this->components[u];
 }
 
-void DynamicGraph::deleteEdge(const Vertex &v, const Vertex &u) {
+void DynamicGraph::deleteEdge(const Vertex &v, const Vertex &u)
+{
     bool edgeExist = edge(v,u,*this).second;
     if (edgeExist) {
         Edge e = edge(v,u,*this).first;
+        this->handleDeletion(v, u);
         boost::remove_edge(e, *this);
-
-        // Component Break
-        if(breaksComponent(v,u)) {
-
-        }
-        // Component Not Break
-
     }
     else {
         throw std::invalid_argument("Edge does not exist");
     }
 }
 
-bool DynamicGraph::breaksComponent(const Vertex &v, const Vertex &u)
+void DynamicGraph::handleDeletion(const Vertex &v, const Vertex &u)
+{
+    #pragma omp parallel sections
+    {
+        #pragma omp section
+        {
+            // Component Not Break
+            checkComponentNotBreak(v, u);
+        }
+
+        #pragma omp section
+        {
+            // Component Breaks
+            checkComponentBreak(v, u);
+        }
+    }
+
+    this->halt = false;
+}
+
+bool DynamicGraph::checkComponentBreak(const Vertex &v, const Vertex &u)
 {
     // Using parallel DFS
     std::list<Vertex> queueV;
     std::list<Vertex> queueU;
     std::vector<bool> visitedV(boost::num_vertices(*this), false);
     std::vector<bool> visitedU(boost::num_vertices(*this), false);
+    std::list<Vertex> visitedListV;
+    std::list<Vertex> visitedListU;
 
     visitedV[v]=true;
     queueV.push_front(v);
+    visitedListV.push_front(v);
 
     visitedU[u]=true;
     queueU.push_front(u);
+    visitedListU.push_front(v);
 
-    while(!queueV.empty() && !queueU.empty()) {
+    while(!this->halt) {
+
         OutEdgeIterator ei, ei_end;
 
         Vertex vv = queueV.front();
@@ -145,14 +173,17 @@ bool DynamicGraph::breaksComponent(const Vertex &v, const Vertex &u)
             if (u == vvTarget) return false;
             if(!visitedV[vvTarget]){
                 queueV.push_front(vvTarget);
+                visitedListV.push_front(vvTarget);
             }
         }
 
         if (queueV.empty()) {
-            this->nextComponent ++;
-            for (auto visited = visitedV.begin(); visited != visitedV.end(); ++visited){
-                if (*visited) this->components[std::distance(visitedV.begin(), visited)] = this->nextComponent;
+            updateVisitedComponents(visitedListV);
+            #pragma omp critical
+            {
+                this->halt = true;
             }
+            return true;
         }
 
         Vertex uu = queueU.front();
@@ -163,18 +194,107 @@ bool DynamicGraph::breaksComponent(const Vertex &v, const Vertex &u)
             if (v == uuTarget) return false;
             if(!visitedU[uuTarget]) {
                 queueU.push_front(uuTarget);
+                visitedListU.push_front(uuTarget);
             }
         }
 
         if (queueU.empty()) {
-            this->nextComponent ++;
-            for (auto visited = visitedU.begin(); visited != visitedU.end(); ++visited){
-                if (*visited) this->components[std::distance(visitedU.begin(), visited)] = this->nextComponent;
+            updateVisitedComponents(visitedListU);
+            #pragma omp critical
+            {
+                this->halt = true;
             }
+            return true;
         }
     }
 }
 
+void DynamicGraph::updateVisitedComponents(std::list<Vertex>& visited)
+{
+    this->nextComponent ++;
+    for (auto v = visited.begin(); v != visited.end(); ++v){
+        this->components[*v] = this->nextComponent;
+    }
+}
+
+bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u)
+{
+    // Case 1: v and u are on the same level
+    if (this->dist[v]==this->dist[u]) {
+        std::cout << "Case 1: " << v << " and " << u << " are on the same level" << std::endl;
+        this->halt = true;
+        this->relatives[v].b_sibl.erase(edge(v, u, *this).first);
+        this->relatives[u].b_sibl.erase(edge(v, u, *this).first);
+        return true;
+    }
+
+    // Keep the old structure deep copy
+    std::vector<int> oldDist(this->dist);
+    std::vector<Relatives> oldRelatives(this->relatives);
+
+    // Case 2: v and u are on different levels
+    if (this->dist[v]!=this->dist[u]) {
+        std::cout << "Case 2:  "<< v << " and " << u << " are on different levels" << std::endl;
+        // For Generality u in Li-1 and v Li
+        if (this->dist[v] < this->dist[u]) {
+            Vertex tmp = v;
+            v = u;
+            u = tmp;
+        }
+        this->relatives[u].c_succ.erase(edge(v, u, *this).first); // *********
+        this->relatives[v].a_pred.erase(edge(v, u, *this).first); // *********
+
+        // Case 2.1: a_pred(v) is not empty
+        if(! this->relatives[v].a_pred.empty()) {
+            std::cout << "Case 2.1: a_pred(" << v << ") is not empty" << std::endl;
+            this->halt = true;
+            return true;
+        }
+        // Case 2.2 a_pred(v) is empty
+        else {
+            std::cout << "Case 2.1: a_pred(" << v << ") is empty" << std::endl;
+            std::list<Vertex> queue;
+            queue.push_back(v);
+
+            // If Q is empty, the procedure and both processes halt
+            while(!queue.empty()) {
+                if(this->halt) {
+                    this->dist = oldDist;
+                    this->relatives = oldRelatives;
+                    return false;
+                }
+
+                // Let w be the first element of Q. Remove w from Q
+                Vertex w = queue.front();
+                queue.pop_front();
+
+                // Remove w from its level (say, Lj), and put it in the next level (Lj+1)
+
+                // For each edge e (w---w') in b_sibl(w), remove e from b_sibl(w') and put it in c_succ(w')
+
+                // a_pred(w) <- b_pred(w)
+
+                // For each edge e (w---w') in c_succ(w),
+                // remove e from a(w') and put it in b_sibl(w');
+                // if the new a_pred(w') is empty, put w' on Q.
+
+                // b_sibl(w) <- c_succ(w)
+                // c_succ(w) <- {empty}
+
+                // If a_pred(w) is empty, put w on Q.
+
+                // Repeat
+            }
+        }
+        this->halt = true;
+        return true;
+    }
+}
+
+/**
+ * Prints graph in GraphViz
+ * https://dreampuf.github.io/GraphvizOnline/
+ */
 void DynamicGraph::visualize()
 {
     // Creating components streams
@@ -190,7 +310,7 @@ void DynamicGraph::visualize()
     }
 
     // Printing graph style
-    std::cout << "graph D {" << std::endl;
+    std::cout << "graph G {" << std::endl;
     std::cout << "  size=\"5,3\"" << std::endl;
     std::cout << "  ratio=\"fill\"" << std::endl;
     std::cout << "  edge[style=\"bold\"]" << std::endl;
@@ -206,35 +326,39 @@ void DynamicGraph::visualize()
         Edge e = *ei;
         u = source(e, *this);
         v = target(e, *this);
-        std::cout << "    " << u << " -- " << v << ";" << std::endl;
+        std::cout << "  " << u << " -- " << v << ";" << std::endl;
     }
 
     std::cout << "}" << std::endl;
 }
 
-void DynamicGraph::printInfo() {
+
+/**
+ * Prints Information about the dynamic graph
+ */
+void DynamicGraph::printInfo()
+{
     for (Vertex v = 0; v < this->dist.size(); v++) {
-        std::cout << "Vertex " << v << " (component " << this->components[v] << ")" << std::endl;
+        std::cout << "Vertex " << v  << std::endl;
+        std::cout << " - component " << this->components[v] << std::endl;
+        std::cout << " - dist " << this->dist[v] << std::endl;
         std::cout << " - pred: ";
-        for (auto ei = this->relEdges[v].a_pred_edges.begin(); ei != this->relEdges[v].a_pred_edges.end(); ei++) {
+        for (auto ei = this->relatives[v].a_pred.begin(); ei != this->relatives[v].a_pred.end(); ei++) {
             std::cout << *ei << " ";
         }
         std::cout << std::endl;
         std::cout << " - sibl: ";
-        for (auto ei = this->relEdges[v].b_sibl_edges.begin(); ei != this->relEdges[v].b_sibl_edges.end(); ei++) {
+        for (auto ei = this->relatives[v].b_sibl.begin(); ei != this->relatives[v].b_sibl.end(); ei++) {
             std::cout << *ei << " ";
         }
         std::cout << std::endl;
         std::cout << " - succ: ";
-        for (auto ei = this->relEdges[v].c_succ_edges.begin(); ei != this->relEdges[v].c_succ_edges.end(); ei++) {
+        for (auto ei = this->relatives[v].c_succ.begin(); ei != this->relatives[v].c_succ.end(); ei++) {
             std::cout << *ei << " ";
         }
         std::cout << std::endl;
     }
 }
-
-
-
 
 
 

@@ -4,17 +4,18 @@
 #include <boost/graph/adjacency_list.hpp>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-        boost::no_property, boost::no_property, boost::no_property, boost::listS> UndirectedGraph;
+        boost::no_property, boost::no_property, boost::no_property,
+        boost::listS> UndirectedGraph;
 typedef boost::graph_traits<UndirectedGraph>::vertex_descriptor Vertex;
 typedef boost::graph_traits<UndirectedGraph>::edge_descriptor Edge;
 typedef boost::graph_traits<UndirectedGraph>::vertex_iterator VertexIterator;
 typedef boost::graph_traits<UndirectedGraph>::edge_iterator EdgeIterator;
 typedef boost::graph_traits<UndirectedGraph>::out_edge_iterator OutEdgeIterator;
 
-struct relatives {
-    std::list<Edge> a_pred_edges;
-    std::list<Edge> b_sibl_edges;
-    std::list<Edge> c_succ_edges;
+struct Relatives {
+    std::set<Edge> a_pred;
+    std::set<Edge> b_sibl;
+    std::set<Edge> c_succ;
 };
 
 class DynamicGraph : public UndirectedGraph
@@ -22,22 +23,31 @@ class DynamicGraph : public UndirectedGraph
 private:
     std::vector<unsigned long> components;
     std::vector<int> dist;
-    std::vector<relatives> relEdges;
+    std::vector<Relatives> relatives;
     std::list<Edge> virtualEdges;
     unsigned long nextComponent = 0;
+    bool halt = false;
 
-    bool breaksComponent(const Vertex&, const Vertex&);
+    // Initialization Operations
     void bfs(const Vertex&);
-    void updateRelEdges();
+    void updateRelatives();
     void hideVirtualEdges();
 
+    // Deletion operations
+    void handleDeletion(const Vertex&, const Vertex&);
+    bool checkComponentBreak(const Vertex &, const Vertex &);
+    void updateVisitedComponents(std::list<Vertex>&);
+    bool checkComponentNotBreak(Vertex, Vertex);
+
 public:
+    // Operations
     void init();
     bool areConnected(const Vertex&, const Vertex&);
     void deleteEdge(const Vertex&, const Vertex&);
+
+    // Printers
     void visualize();
     void printInfo();
 };
-
 
 #endif
