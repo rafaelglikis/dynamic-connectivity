@@ -391,7 +391,9 @@ void DynamicGraph::visualize(bool printVirtualEdges) const
         Edge e = *ei;
         u = source(e, *this);
         v = target(e, *this);
-        std::cout << "  " << u << " -- " << v << ";" << std::endl;
+        std::cout << "  " << u << " -- " << v;
+        if (virtualEdges.count(*ei)) std::cout << "[style=dotted]";
+        std::cout << ";" << std::endl;
     }
 
     std::cout << "}" << std::endl;
