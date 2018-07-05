@@ -1,7 +1,7 @@
 #ifndef DYNAMIC_CONNECTIVITY_DYNAMICGRAPH_H
 #define DYNAMIC_CONNECTIVITY_DYNAMICGRAPH_H
 #include "Graph.h"
-#include "relatives.h"
+#include "Relatives.h"
 #include <set>
 
 class DynamicGraph : public UndirectedGraph
@@ -19,10 +19,10 @@ private:
     void updateRelatives();
 
     // Deletion operations
-    void handleDeletion(const Vertex&, const Vertex&);
+    void handleDeletion(Edge);
     bool checkComponentBreak(const Vertex &, const Vertex &);
-    void updateVisitedComponents(std::list<Vertex>&);
-    bool checkComponentNotBreak(Vertex, Vertex);
+    void updateVisitedComponents(const std::list<Vertex>&);
+    bool checkComponentNotBreak(Vertex, Vertex, Edge);
 
 public:
     // Operations
@@ -33,8 +33,9 @@ public:
     void showVirtualEdges();
 
     // Printers
-    void visualize();
-    void printInfo();
+    void visualize() const;
+    void visualize(bool) const;
+    void printInfo() const;
 };
 
 #endif
