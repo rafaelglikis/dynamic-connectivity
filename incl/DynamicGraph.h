@@ -25,6 +25,8 @@ private:
     void handleDeletion(Edge);
     bool checkComponentBreak(const Vertex &, const Vertex &);
     void updateVisitedComponents(const std::list<Vertex>&);
+    bool bdbfsStep(std::list<Vertex>&, std::vector<bool>&,
+            std::vector<bool>&, std::list<Vertex>&);
     bool checkComponentNotBreak(Vertex, Vertex, Edge);
 
     void rollBack(std::list<Action*>&, std::list<Vertex>&);

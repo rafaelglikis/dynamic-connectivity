@@ -151,65 +151,57 @@ bool DynamicGraph::checkComponentBreak(const Vertex &v, const Vertex &u)
 
     visitedV[v]=true;
     visitedU[u]=true;
-
     queueV.push_back(v);
     queueU.push_back(u);
-
     visitedListV.push_back(v);
     visitedListU.push_back(u);
 
     while(!queueV.empty() && !queueU.empty()) {
-        OutEdgeIterator ei, ei_end;
         if (this->halt) {
             return false;
         }
 
-        Vertex vv = queueV.front();
-        visitedV[vv]=true;
-        queueV.pop_front();
-
-        for(boost::tie(ei, ei_end) = out_edges(vv, *this); ei != ei_end; ++ei) {
-            Vertex vvTarget = target(*ei, *this);
-            if (visitedU[vvTarget]) {
-                return false;
-            }
-            if(!visitedV[vvTarget] && !virtualEdges.count(*ei)){
-                queueV.push_back(vvTarget);
-                visitedListV.push_back(vvTarget);
-            }
+        if(!this->bdbfsStep(queueV, visitedV, visitedU, visitedListV) || this->halt) {
+            return false;
         }
 
         if (queueV.empty()) {
+            this->halt = true;
             updateVisitedComponents(visitedListV);
             break;
         }
 
-        Vertex uu = queueU.front();
-        visitedU[uu]=true;
-        queueU.pop_front();
-
-        for(boost::tie(ei, ei_end) = out_edges(uu, *this); ei != ei_end; ++ei) {
-            Vertex uuTarget = target(*ei, *this);
-            if (visitedV[uuTarget]) {
-                return false;
-            }
-            if(!visitedU[uuTarget] && !virtualEdges.count(*ei)) {
-                queueU.push_back(uuTarget);
-                visitedListU.push_back(uuTarget);
-            }
+        if(!this->bdbfsStep(queueU, visitedU, visitedV, visitedListU) || this->halt) {
+            return false;
         }
 
         if (queueU.empty()) {
+            this->halt = true;
             updateVisitedComponents(visitedListU);
             break;
         }
     }
+    return true;
+}
 
-    #pragma omp critical
-    {
-        this->halt = true;
+bool DynamicGraph::bdbfsStep(std::list<Vertex>& queue, std::vector<bool>& visitedV,
+               std::vector<bool>& visitedU, std::list<Vertex>& visitedList)
+{
+    Vertex vv = queue.front();
+    visitedV[vv]=true;
+    queue.pop_front();
+
+    OutEdgeIterator ei, ei_end;
+    for(boost::tie(ei, ei_end) = out_edges(vv, *this); ei != ei_end; ++ei) {
+        Vertex vvTarget = target(*ei, *this);
+        if (visitedU[vvTarget]) {
+            return false;
+        }
+        if(!visitedV[vvTarget] && !virtualEdges.count(*ei)){
+            queue.push_back(vvTarget);
+            visitedList.push_back(vvTarget);
+        }
     }
-
     return true;
 }
 
