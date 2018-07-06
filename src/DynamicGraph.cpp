@@ -251,6 +251,12 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
         // Case 2.1: a_pred(v) is not empty
         if(!this->relatives[v].a_pred.empty()) {
             this->halt = true;
+
+            while (!actions.empty()) {
+                delete actions.front();
+                actions.pop_front();
+            }
+
             return true;
         }
         // Case 2.2 a_pred(v) is empty
@@ -334,6 +340,12 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
                 }
             }
         }
+
+        while (!actions.empty()) {
+            delete actions.front();
+            actions.pop_front();
+        }
+
         this->halt = true;
         return true;
     }
@@ -345,7 +357,7 @@ void DynamicGraph::rollBack(std::list<Action*> &actions, std::list<Vertex>& incV
         Action* action = actions.front();
         actions.pop_front();
         action->undo();
-        //delete action;
+        delete action;
     }
 
     while(!incVertices.empty()) {
