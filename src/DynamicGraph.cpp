@@ -123,13 +123,11 @@ void DynamicGraph::handleDeletion(Edge e)
     {
         #pragma omp section
         {
-            // Component Not Break
             checkComponentNotBreak(v, u, e);
         }
 
         #pragma omp section
         {
-            // Component Breaks
             if(checkComponentBreak(v, u)) {
                 add_edge(v, u, *this);
                 this->virtualEdges.insert(edge(v, u, *this).first);
@@ -159,12 +157,10 @@ bool DynamicGraph::checkComponentBreak(const Vertex &v, const Vertex &u)
     visitedListU.push_back(u);
 
     while(!queueV.empty() && !queueU.empty()) {
-
+        OutEdgeIterator ei, ei_end;
         if (this->halt) {
             return false;
         }
-
-        OutEdgeIterator ei, ei_end;
 
         Vertex vv = queueV.front();
         visitedV[vv]=true;
@@ -222,18 +218,12 @@ void DynamicGraph::updateVisitedComponents(const std::list<Vertex>& visited)
         this->components[*v] = this->nextComponent;
     }
     Vertex v = *visited.begin();
-
-//    // *************************************************
-//    add_edge(0, v, *this);
-//    this->virtualEdges.insert(edge(0, v, *this).first);
-//    // *************************************************
 }
 
 bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
 {
     // Case 1: v and u are on the same level
     if (this->dist[v]==this->dist[u]) {
-        std::cout << "Case 1: " << v << " and " << u << " are on the same level" << std::endl;
         this->halt = true;
         this->relatives[v].b_sibl.erase(e);
         this->relatives[u].b_sibl.erase(e);
@@ -246,25 +236,23 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
 
     // Case 2: v and u are on different levels
     if (this->dist[v]!=this->dist[u]) {
-        std::cout << "Case 2:  "<< v << " and " << u << " are on different levels" << std::endl;
         // For Generality u in Li-1 and v Li
         if (this->dist[v] < this->dist[u]) {
             Vertex tmp = v;
             v = u;
             u = tmp;
         }
+
         this->relatives[u].c_succ.erase(e);
         this->relatives[v].a_pred.erase(e);
 
         // Case 2.1: a_pred(v) is not empty
         if(!this->relatives[v].a_pred.empty()) {
-            std::cout << "Case 2.1: a_pred(" << v << ") is not empty" << std::endl;
             this->halt = true;
             return true;
         }
         // Case 2.2 a_pred(v) is empty
         else {
-            std::cout << "Case 2.1: a_pred(" << v << ") is empty" << std::endl;
             std::list<Vertex> queue;
             queue.push_back(v);
 
@@ -321,9 +309,7 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
                     queue.push_back(w);
                 }
 
-                if (this->halt)
-                {
-                    std::cout << "process halt" << std::endl;
+                if (this->halt) {
                     this->dist = oldDist;
                     this->relatives = oldRelatives;
                 }
@@ -414,6 +400,8 @@ void DynamicGraph::printInfo() const
         std::cout << std::endl;
     }
 }
+
+
 
 
 

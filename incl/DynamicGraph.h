@@ -1,11 +1,15 @@
 #ifndef DYNAMIC_CONNECTIVITY_DYNAMICGRAPH_H
 #define DYNAMIC_CONNECTIVITY_DYNAMICGRAPH_H
-#include "Graph.h"
+
+#include "UndirectedGraph.h"
 #include "Relatives.h"
 #include <set>
 
+class Action;
+
 class DynamicGraph : public UndirectedGraph
 {
+    friend Action;
 private:
     std::vector<unsigned long> components;
     std::vector<int> dist;

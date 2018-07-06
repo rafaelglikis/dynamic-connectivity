@@ -19,4 +19,4 @@ if (OPENMP_FOUND)
     set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
-add_executable(dynamic_connectivity main.cpp src/DynamicGraph.cpp incl/DynamicGraph.h src/DynamicGraph.cpp incl/Relatives.h incl/Graph.h)
+add_executable(dynamic_connectivity main.cpp src/DynamicGraph.cpp incl/DynamicGraph.h src/DynamicGraph.cpp incl/Relatives.h incl/UndirectedGraph.h src/Action.cpp incl/Action.h src/DeleteAction.cpp incl/DeleteAction.h src/InsertAction.cpp incl/InsertAction.h src/IncreamentDistance.cpp incl/IncreamentDistance.h)

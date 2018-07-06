@@ -3,7 +3,6 @@
 #include <iostream>
 
 
-
 int main()
 {
     DynamicGraph G;
