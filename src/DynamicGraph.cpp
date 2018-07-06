@@ -16,12 +16,29 @@ void DynamicGraph::init()
 
 void DynamicGraph::buildBFSStructure(const Vertex &s)
 {
-    std::list<Vertex> queue;
     std::vector<bool> visited(boost::num_vertices(*this));
     this->nextComponent++;
+    this->bfs(s, visited, 0);
 
+    while(std::find(visited.begin(), visited.end(), 0) != visited.end() ) {
+        // Add Virtual Edges
+        for(Vertex i=1; i<dist.size(); ++i ) {
+            if(!visited[i]){
+                boost::add_edge(0, i, *this);
+                this->virtualEdges.insert(edge(0,i,*this).first);
+
+                this->nextComponent++;
+                this->bfs(i, visited, 1);
+            }
+        }
+    }
+}
+
+void DynamicGraph::bfs(const Vertex &s, std::vector<bool> &visited, const int startingDistance)
+{
+    std::list<Vertex> queue;
+    this->dist[s] = 1;
     visited[s]=true;
-    this->dist[s] = 0;
     this->components[s] = this->nextComponent;
     queue.push_back(s);
 
@@ -38,41 +55,6 @@ void DynamicGraph::buildBFSStructure(const Vertex &s)
                 this->components[u] = this->nextComponent;
                 visited[u]=true;
                 queue.push_back(u);
-            }
-        }
-    }
-
-
-
-    while(std::find(visited.begin(), visited.end(), 0) != visited.end() ) {
-        // Add Virtual Edges
-        for(Vertex i=1; i<dist.size(); ++i ) {
-            if(!visited[i]){
-                boost::add_edge(0, i, *this);
-                this->virtualEdges.insert(edge(0,i,*this).first);
-
-                this->nextComponent++;
-                visited[i]=true;
-                this->dist[i] = 1;
-                this->components[i] = this->nextComponent;
-                queue.push_back(i);
-
-                // Basic BFS
-                while(!queue.empty()) {
-                    Vertex v = queue.front();
-                    queue.pop_front();
-
-                    OutEdgeIterator ei, ei_end;
-                    for(boost::tie(ei, ei_end) = out_edges(v, *this); ei != ei_end; ++ei) {
-                        Vertex u = target(*ei, *this);
-                        if(!visited[u]){
-                            dist[u] = this->dist[v]+1;
-                            this->components[u] = this->nextComponent;
-                            visited[u]=true;
-                            queue.push_back(u);
-                        }
-                    }
-                }
             }
         }
     }
@@ -159,7 +141,7 @@ void DynamicGraph::handleDeletion(Edge e)
 
 bool DynamicGraph::checkComponentBreak(const Vertex &v, const Vertex &u)
 {
-    // Using parallel BFS
+    // Using bidirectional BFS
     std::list<Vertex> queueV;
     std::list<Vertex> queueU;
     std::vector<bool> visitedV(boost::num_vertices(*this), false);
@@ -177,40 +159,51 @@ bool DynamicGraph::checkComponentBreak(const Vertex &v, const Vertex &u)
     visitedListU.push_back(u);
 
     while(!queueV.empty() && !queueU.empty()) {
+
+        if (this->halt) {
+            return false;
+        }
+
         OutEdgeIterator ei, ei_end;
 
         Vertex vv = queueV.front();
         visitedV[vv]=true;
         queueV.pop_front();
 
-        Vertex uu = queueU.front();
-        visitedU[uu]=true;
-        queueU.pop_front();
-
         for(boost::tie(ei, ei_end) = out_edges(vv, *this); ei != ei_end; ++ei) {
             Vertex vvTarget = target(*ei, *this);
+            if (visitedU[vvTarget]) {
+                return false;
+            }
             if(!visitedV[vvTarget] && !virtualEdges.count(*ei)){
                 queueV.push_back(vvTarget);
                 visitedListV.push_back(vvTarget);
             }
-            else if (u == vvTarget) {
-                return false;
-            }
         }
+
+        if (queueV.empty()) {
+            updateVisitedComponents(visitedListV);
+            break;
+        }
+
+        Vertex uu = queueU.front();
+        visitedU[uu]=true;
+        queueU.pop_front();
 
         for(boost::tie(ei, ei_end) = out_edges(uu, *this); ei != ei_end; ++ei) {
             Vertex uuTarget = target(*ei, *this);
+            if (visitedV[uuTarget]) {
+                return false;
+            }
             if(!visitedU[uuTarget] && !virtualEdges.count(*ei)) {
                 queueU.push_back(uuTarget);
                 visitedListU.push_back(uuTarget);
             }
-            else if (v == uuTarget) {
-                return false;
-            }
         }
 
-        if (this->halt) {
-            return false;
+        if (queueU.empty()) {
+            updateVisitedComponents(visitedListU);
+            break;
         }
     }
 
@@ -219,20 +212,12 @@ bool DynamicGraph::checkComponentBreak(const Vertex &v, const Vertex &u)
         this->halt = true;
     }
 
-    if (queueV.empty()) {
-        updateVisitedComponents(visitedListV);
-    }
-
-    if (queueU.empty()) {
-        updateVisitedComponents(visitedListU);
-    }
-
     return true;
 }
 
 void DynamicGraph::updateVisitedComponents(const std::list<Vertex>& visited)
 {
-    this->nextComponent ++;
+    this->nextComponent++;
     for (auto v = visited.begin(); v != visited.end(); ++v){
         this->components[*v] = this->nextComponent;
     }
@@ -386,7 +371,7 @@ void DynamicGraph::visualize() const
         u = source(e, *this);
         v = target(e, *this);
         std::cout << "  " << u << " -- " << v;
-        if (virtualEdges.count(*ei)) std::cout << "[style=dotted]";
+        if (virtualEdges.count(*ei)) std::cout << " [style=dotted]";
         std::cout << ";" << std::endl;
     }
 
@@ -429,6 +414,8 @@ void DynamicGraph::printInfo() const
         std::cout << std::endl;
     }
 }
+
+
 
 
 

@@ -15,7 +15,8 @@ private:
     bool halt = false;
 
     // Initialization Operations
-    void buildBFSStructure(const Vertex &);
+    void buildBFSStructure(const Vertex&);
+    void bfs(const Vertex& , std::vector<bool>&, const int);
     void updateRelatives();
 
     // Deletion operations

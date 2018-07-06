@@ -38,14 +38,34 @@ int main()
 
     G.visualize();
 
+    G.deleteEdge(4, 5);
+    G.deleteEdge(4, 6);
+
     G.deleteEdge(13, 15);
     G.deleteEdge(9, 10);
+
+    G.deleteEdge(16, 17);
+    G.deleteEdge(16, 19);
+
+    G.deleteEdge(12, 10);
+    G.deleteEdge(13, 12);
+
+    G.deleteEdge(7, 8);
+
+    G.deleteEdge(0, 1);
+    G.deleteEdge(0, 2);
+    G.deleteEdge(2, 3);
+
+    G.deleteEdge(18, 17);
+    G.deleteEdge(18, 19);
+
+    G.deleteEdge(15, 11);
     G.deleteEdge(9, 11);
     G.deleteEdge(10, 11);
     G.deleteEdge(13, 11);
-    G.deleteEdge(15, 11);
-    G.deleteEdge(12, 10);
-    G.deleteEdge(13, 12);
+
+
+    G.deleteEdge(6, 5);
 
 //    G.printInfo();
 
