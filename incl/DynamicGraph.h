@@ -24,12 +24,14 @@ private:
     // Deletion operations
     void handleDeletion(Edge);
     bool checkComponentBreak(const Vertex &, const Vertex &);
-    void updateVisitedComponents(const std::list<Vertex>&);
     bool bdbfsStep(std::list<Vertex>&, std::vector<bool>&,
             std::vector<bool>&, std::list<Vertex>&);
+    void updateVisitedComponents(const std::list<Vertex> &);
     bool checkComponentNotBreak(Vertex, Vertex, Edge);
-
+    void dropLevel(Vertex w, std::list<Vertex> &,
+            std::list<Action*> &, std::list<Vertex> &);
     void rollBack(std::list<Action*>&, std::list<Vertex>&);
+
 public:
 
     // Operations
@@ -42,6 +44,7 @@ public:
     // Printers
     void visualize() const;
     void printInfo() const;
+
 };
 
 #endif

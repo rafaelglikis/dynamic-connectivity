@@ -242,12 +242,10 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
         // Case 2.1: a_pred(v) is not empty
         if(!this->relatives[v].a_pred.empty()) {
             this->halt = true;
-
             while (!actions.empty()) {
                 delete actions.front();
                 actions.pop_front();
             }
-
             return true;
         }
         // Case 2.2 a_pred(v) is empty
@@ -260,67 +258,7 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
                 // Let w be the first element of Q. Remove w from Q
                 Vertex w = queue.front();
                 queue.pop_front();
-
-                // Remove w from its level (say, Lj), and put it in the next level (Lj+1)
-                incVertices.push_front(w);
-                this->dist[w]++;
-
-                // For each edge e (w---w') in b_sibl(w)
-                for(auto ei = this->relatives[w].b_sibl.begin(); ei!=this->relatives[w].b_sibl.end(); ++ei) {
-                    Vertex ww = (w==target(*ei, *this)) ? source(*ei, *this) : target(*ei, *this);
-                    // remove e from b_sibl(w')
-                    actions.push_front(new Delete(*this, ww, this->relatives[ww].b_sibl, *ei));
-                    this->relatives[ww].b_sibl.erase(*ei);
-                    // and put it in c_succ(w')
-                    actions.push_front(new Insert(*this, ww, this->relatives[ww].c_succ, *ei));
-                    this->relatives[ww].c_succ.insert(*ei);
-                }
-
-                // a_pred(w) <- b_pred(w)
-                for(auto ei = this->relatives[w].a_pred.begin(); ei!=this->relatives[w].a_pred.end(); ++ei) {
-                    actions.push_front(new Delete(*this, w, this->relatives[w].a_pred, *ei));
-                }
-                this->relatives[w].a_pred.clear();
-                for(auto ei = this->relatives[w].b_sibl.begin(); ei!=this->relatives[w].b_sibl.end(); ++ei) {
-                    actions.push_front(new Insert(*this, w, this->relatives[w].a_pred, *ei));
-                    this->relatives[w].a_pred.insert(*ei);
-                }
-
-                // For each edge e (w---w') in c_succ(w)
-                for(auto ei = this->relatives[w].c_succ.begin(); ei!=this->relatives[w].c_succ.end(); ++ei) {
-                    Vertex ww = (w==target(*ei, *this)) ? source(*ei, *this) : target(*ei, *this);
-                    // remove e from a_pred(w')
-                    actions.push_front(new Delete(*this, ww, this->relatives[ww].a_pred, *ei));
-                    this->relatives[ww].a_pred.erase(*ei);
-                    // and put it in b_sibl(w');
-                    actions.push_front(new Insert(*this, ww, this->relatives[ww].b_sibl, *ei));
-                    this->relatives[ww].b_sibl.insert(*ei);
-                    // if the new a_pred(w') is empty, put w' on Q.
-                    if(this->relatives[ww].a_pred.empty()) {
-                        queue.push_back(ww);
-                    }
-                }
-
-                // b_sibl(w) <- c_succ(w)
-                for(auto ei = this->relatives[w].b_sibl.begin(); ei!=this->relatives[w].b_sibl.end(); ++ei) {
-                    actions.push_front(new Delete(*this, w, this->relatives[w].b_sibl, *ei));
-                }
-                this->relatives[w].b_sibl.clear();
-                for(auto ei = this->relatives[w].c_succ.begin(); ei!=this->relatives[w].c_succ.end(); ++ei) {
-                    actions.push_front(new Insert(*this, w, this->relatives[w].b_sibl, *ei));
-                    this->relatives[w].b_sibl.insert(*ei);
-                }
-
-                // c_succ(w) <- {empty}
-                for(auto ei = this->relatives[w].c_succ.begin(); ei!=this->relatives[w].c_succ.end(); ++ei) {
-                    actions.push_front(new Delete(*this, w, this->relatives[w].c_succ, *ei));
-                }
-                this->relatives[w].c_succ.clear();
-
-                // If a_pred(w) is empty, put w on Q.
-                if(this->relatives[w].a_pred.empty()) {
-                    queue.push_back(w);
-                }
+                dropLevel(w, queue, actions, incVertices);
 
                 // Repeat
                 if(this->halt) {
@@ -337,6 +275,71 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
 
         this->halt = true;
         return true;
+    }
+}
+
+void DynamicGraph::dropLevel(Vertex w, std::list<Vertex> &queue,
+                             std::list<Action *> &actions, std::list<Vertex> &incVertices)
+{
+    // Remove w from its level (say, Lj), and put it in the next level (Lj+1)
+    incVertices.push_front(w);
+    dist[w]++;
+
+    // For each edge e (w---w') in b_sibl(w)
+    for(auto ei = relatives[w].b_sibl.begin(); ei != relatives[w].b_sibl.end(); ++ei) {
+        Vertex ww = (w==target(*ei, *this)) ? source(*ei, *this) : target(*ei, *this);
+        // remove e from b_sibl(w')
+        actions.push_front(new Delete(*this, ww, relatives[ww].b_sibl, *ei));
+        relatives[ww].b_sibl.erase(*ei);
+        // and put it in c_succ(w')
+        actions.push_front(new Insert(*this, ww, relatives[ww].c_succ, *ei));
+        relatives[ww].c_succ.insert(*ei);
+    }
+
+    // a_pred(w) <- b_pred(w)
+    for(auto ei = relatives[w].a_pred.begin(); ei != relatives[w].a_pred.end(); ++ei) {
+        actions.push_front(new Delete(*this, w, relatives[w].a_pred, *ei));
+    }
+    relatives[w].a_pred.clear();
+    for(auto ei = relatives[w].b_sibl.begin(); ei != relatives[w].b_sibl.end(); ++ei) {
+        actions.push_front(new Insert(*this, w, relatives[w].a_pred, *ei));
+        relatives[w].a_pred.insert(*ei);
+    }
+
+    // For each edge e (w---w') in c_succ(w)
+    for(auto ei = relatives[w].c_succ.begin(); ei != relatives[w].c_succ.end(); ++ei) {
+        Vertex ww = (w==target(*ei, *this)) ? source(*ei, *this) : target(*ei, *this);
+        // remove e from a_pred(w')
+        actions.push_front(new Delete(*this, ww, relatives[ww].a_pred, *ei));
+        relatives[ww].a_pred.erase(*ei);
+        // and put it in b_sibl(w');
+        actions.push_front(new Insert(*this, ww, relatives[ww].b_sibl, *ei));
+        relatives[ww].b_sibl.insert(*ei);
+        // if the new a_pred(w') is empty, put w' on Q.
+        if(relatives[ww].a_pred.empty()) {
+            queue.push_back(ww);
+        }
+    }
+
+    // b_sibl(w) <- c_succ(w)
+    for(auto ei = relatives[w].b_sibl.begin(); ei != relatives[w].b_sibl.end(); ++ei) {
+        actions.push_front(new Delete(*this, w, relatives[w].b_sibl, *ei));
+    }
+    relatives[w].b_sibl.clear();
+    for(auto ei = relatives[w].c_succ.begin(); ei != relatives[w].c_succ.end(); ++ei) {
+        actions.push_front(new Insert(*this, w, relatives[w].b_sibl, *ei));
+        relatives[w].b_sibl.insert(*ei);
+    }
+
+    // c_succ(w) <- {empty}
+    for(auto ei = relatives[w].c_succ.begin(); ei != relatives[w].c_succ.end(); ++ei) {
+        actions.push_front(new Delete(*this, w, relatives[w].c_succ, *ei));
+    }
+    relatives[w].c_succ.clear();
+
+    // If a_pred(w) is empty, put w on Q.
+    if(relatives[w].a_pred.empty()) {
+        queue.push_back(w);
     }
 }
 
