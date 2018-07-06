@@ -39,7 +39,7 @@ void DynamicGraph::buildBFSStructure(const Vertex &s)
 void DynamicGraph::bfs(const Vertex &s, std::vector<bool> &visited, const int startingDistance)
 {
     std::list<Vertex> queue;
-    this->dist[s] = 1;
+    this->dist[s] = startingDistance;
     visited[s]=true;
     this->components[s] = this->nextComponent;
     queue.push_back(s);
@@ -219,7 +219,6 @@ void DynamicGraph::updateVisitedComponents(const std::list<Vertex>& visited)
     for (auto v = visited.begin(); v != visited.end(); ++v){
         this->components[*v] = this->nextComponent;
     }
-    Vertex v = *visited.begin();
 }
 
 bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
@@ -266,8 +265,6 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
 
             // If Q is empty, the procedure and both processes halt
             while(!queue.empty()) {
-
-
                 // Let w be the first element of Q. Remove w from Q
                 Vertex w = queue.front();
                 queue.pop_front();
@@ -277,35 +274,35 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
                 this->dist[w]++;
 
                 // For each edge e (w---w') in b_sibl(w)
-                for(auto e = this->relatives[w].b_sibl.begin(); e!=this->relatives[w].b_sibl.end(); ++e) {
-                    Vertex ww = (w==target(*e, *this)) ? source(*e, *this) : target(*e, *this);
+                for(auto ei = this->relatives[w].b_sibl.begin(); ei!=this->relatives[w].b_sibl.end(); ++ei) {
+                    Vertex ww = (w==target(*ei, *this)) ? source(*ei, *this) : target(*ei, *this);
                     // remove e from b_sibl(w')
-                    actions.push_front(new Delete(*this, ww, this->relatives[ww].b_sibl, *e));
-                    this->relatives[ww].b_sibl.erase(*e);
+                    actions.push_front(new Delete(*this, ww, this->relatives[ww].b_sibl, *ei));
+                    this->relatives[ww].b_sibl.erase(*ei);
                     // and put it in c_succ(w')
-                    actions.push_front(new Insert(*this, ww, this->relatives[ww].c_succ, *e));
-                    this->relatives[ww].c_succ.insert(*e);
+                    actions.push_front(new Insert(*this, ww, this->relatives[ww].c_succ, *ei));
+                    this->relatives[ww].c_succ.insert(*ei);
                 }
 
                 // a_pred(w) <- b_pred(w)
-                for(auto e = this->relatives[w].a_pred.begin(); e!=this->relatives[w].a_pred.end(); ++e) {
-                    actions.push_front(new Delete(*this, w, this->relatives[w].a_pred, *e));
+                for(auto ei = this->relatives[w].a_pred.begin(); ei!=this->relatives[w].a_pred.end(); ++ei) {
+                    actions.push_front(new Delete(*this, w, this->relatives[w].a_pred, *ei));
                 }
                 this->relatives[w].a_pred.clear();
-                for(auto e = this->relatives[w].b_sibl.begin(); e!=this->relatives[w].b_sibl.end(); ++e) {
-                    actions.push_front(new Insert(*this, w, this->relatives[w].a_pred, *e));
-                    this->relatives[w].a_pred.insert(*e);
+                for(auto ei = this->relatives[w].b_sibl.begin(); ei!=this->relatives[w].b_sibl.end(); ++ei) {
+                    actions.push_front(new Insert(*this, w, this->relatives[w].a_pred, *ei));
+                    this->relatives[w].a_pred.insert(*ei);
                 }
 
                 // For each edge e (w---w') in c_succ(w)
-                for(auto e = this->relatives[w].c_succ.begin(); e!=this->relatives[w].c_succ.end(); ++e) {
-                    Vertex ww = (w==target(*e, *this)) ? source(*e, *this) : target(*e, *this);
+                for(auto ei = this->relatives[w].c_succ.begin(); ei!=this->relatives[w].c_succ.end(); ++ei) {
+                    Vertex ww = (w==target(*ei, *this)) ? source(*ei, *this) : target(*ei, *this);
                     // remove e from a_pred(w')
-                    actions.push_front(new Delete(*this, ww, this->relatives[ww].a_pred, *e));
-                    this->relatives[ww].a_pred.erase(*e);
+                    actions.push_front(new Delete(*this, ww, this->relatives[ww].a_pred, *ei));
+                    this->relatives[ww].a_pred.erase(*ei);
                     // and put it in b_sibl(w');
-                    actions.push_front(new Insert(*this, ww, this->relatives[ww].b_sibl, *e));
-                    this->relatives[ww].b_sibl.insert(*e);
+                    actions.push_front(new Insert(*this, ww, this->relatives[ww].b_sibl, *ei));
+                    this->relatives[ww].b_sibl.insert(*ei);
                     // if the new a_pred(w') is empty, put w' on Q.
                     if(this->relatives[ww].a_pred.empty()) {
                         queue.push_back(ww);
@@ -313,18 +310,18 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
                 }
 
                 // b_sibl(w) <- c_succ(w)
-                for(auto e = this->relatives[w].b_sibl.begin(); e!=this->relatives[w].b_sibl.end(); ++e) {
-                    actions.push_front(new Delete(*this, w, this->relatives[w].b_sibl, *e));
+                for(auto ei = this->relatives[w].b_sibl.begin(); ei!=this->relatives[w].b_sibl.end(); ++ei) {
+                    actions.push_front(new Delete(*this, w, this->relatives[w].b_sibl, *ei));
                 }
                 this->relatives[w].b_sibl.clear();
-                for(auto e = this->relatives[w].c_succ.begin(); e!=this->relatives[w].c_succ.end(); ++e) {
-                    actions.push_front(new Insert(*this, w, this->relatives[w].b_sibl, *e));
-                    this->relatives[w].b_sibl.insert(*e);
+                for(auto ei = this->relatives[w].c_succ.begin(); ei!=this->relatives[w].c_succ.end(); ++ei) {
+                    actions.push_front(new Insert(*this, w, this->relatives[w].b_sibl, *ei));
+                    this->relatives[w].b_sibl.insert(*ei);
                 }
 
                 // c_succ(w) <- {empty}
-                for(auto e = this->relatives[w].c_succ.begin(); e!=this->relatives[w].c_succ.end(); ++e) {
-                    actions.push_front(new Delete(*this, w, this->relatives[w].c_succ, *e));
+                for(auto ei = this->relatives[w].c_succ.begin(); ei!=this->relatives[w].c_succ.end(); ++ei) {
+                    actions.push_front(new Delete(*this, w, this->relatives[w].c_succ, *ei));
                 }
                 this->relatives[w].c_succ.clear();
 
