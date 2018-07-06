@@ -4,13 +4,10 @@
 
 #include "Action.h"
 
-class InsertAction : public Action
+class Insert : public Action
 {
-private:
-    std::set<Edge> rel;
-    Edge edge;
 public:
-    InsertAction(DynamicGraph&, Vertex, std::set<Edge>&, Edge);
+    Insert(DynamicGraph&, Vertex, std::set<Edge>&, Edge);
     void undo() override;
 };
 

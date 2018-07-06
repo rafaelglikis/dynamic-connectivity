@@ -6,30 +6,30 @@
 #include <set>
 
 class Action;
-
 class DynamicGraph : public UndirectedGraph
 {
-    friend Action;
 private:
     std::vector<unsigned long> components;
     std::vector<int> dist;
-    std::vector<Relatives> relatives;
     std::set<Edge> virtualEdges;
     unsigned long nextComponent = 0;
+    std::vector<Relatives> relatives;
     bool halt = false;
 
     // Initialization Operations
     void buildBFSStructure(const Vertex&);
     void bfs(const Vertex& , std::vector<bool>&, const int);
-    void updateRelatives();
 
+    void updateRelatives();
     // Deletion operations
     void handleDeletion(Edge);
     bool checkComponentBreak(const Vertex &, const Vertex &);
     void updateVisitedComponents(const std::list<Vertex>&);
     bool checkComponentNotBreak(Vertex, Vertex, Edge);
 
+    void rollBack(std::list<Action*>&, std::list<Vertex>&);
 public:
+
     // Operations
     void init();
     bool areConnected(const Vertex&, const Vertex&);

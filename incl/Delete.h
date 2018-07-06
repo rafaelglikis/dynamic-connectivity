@@ -4,15 +4,11 @@
 
 #include "Action.h"
 
-class DeleteAction : public Action
+class Delete : public Action
 {
-private:
-    std::set<Edge> rel;
-    Edge edge;
 public:
-    DeleteAction(DynamicGraph&, Vertex, std::set<Edge>&, Edge);
+    Delete(DynamicGraph&, Vertex, std::set<Edge>&, Edge);
     void undo() override;
 };
-
 
 #endif //DYNAMIC_CONNECTIVITY_DELETEACTION_H

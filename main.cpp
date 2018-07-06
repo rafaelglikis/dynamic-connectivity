@@ -32,10 +32,16 @@ int main()
     add_edge(16, 19, G);
     add_edge(18, 17, G);
     add_edge(18, 19, G);
+//
+//    for (Vertex i = 20; i<50; ++i) {
+//        add_edge(i-1, i, G);
+//    }
+//    G.deleteEdge(23, 24);
+
 
     G.init();
 
-    G.visualize();
+//    G.visualize();
 
     G.deleteEdge(4, 5);
     G.deleteEdge(4, 6);
@@ -64,9 +70,10 @@ int main()
     G.deleteEdge(13, 11);
 
 
+
     G.deleteEdge(6, 5);
 
-//    G.printInfo();
+    G.printInfo();
 
     //G.deleteEdge(14, 13);
     //G.deleteEdge(14, 15);
