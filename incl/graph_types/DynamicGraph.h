@@ -4,8 +4,8 @@
 #include "UndirectedGraph.h"
 #include "Relatives.h"
 #include <set>
-
 class Action;
+
 class DynamicGraph : public UndirectedGraph
 {
 private:
@@ -18,7 +18,7 @@ private:
 
     // Initialization Operations
     void buildBFSStructure(const Vertex&);
-    void bfs(const Vertex& , std::vector<bool>&, const int);
+    void bfs(const Vertex& , std::vector<bool>&, int);
 
     void updateRelatives();
     // Deletion operations
@@ -33,13 +33,17 @@ private:
     void rollBack(std::list<Action*>&, std::list<Vertex>&);
 
 public:
-
     // Operations
     void init();
     bool areConnected(const Vertex&, const Vertex&);
     void deleteEdge(const Vertex&, const Vertex&);
     void hideVirtualEdges();
     void showVirtualEdges();
+
+    // getters
+    int getDistance(Vertex v) const;
+    unsigned long getComponent(Vertex v) const;
+    std::list<Edge> getVirtualEdges() const;
 
     // Printers
     void visualize() const;

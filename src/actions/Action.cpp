@@ -1,4 +1,4 @@
-#include "../incl/Action.h"
+#include "../../incl/actions/Action.h"
 
 Action::Action(DynamicGraph &G, Vertex v, std::set<Edge>& rel, Edge e)
 {

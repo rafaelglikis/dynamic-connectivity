@@ -2,7 +2,7 @@
 #define DYNAMIC_CONNECTIVITY_ACTION_H
 
 
-#include "DynamicGraph.h"
+#include "../graph_types/DynamicGraph.h"
 class DynamicGraph;
 class Action
 {

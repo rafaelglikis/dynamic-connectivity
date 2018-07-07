@@ -1,6 +1,6 @@
-#include "../incl/DynamicGraph.h"
-#include "../incl/Delete.h"
-#include "../incl/Insert.h"
+#include "../../incl/graph_types/DynamicGraph.h"
+#include "../../incl/actions/Delete.h"
+#include "../../incl/actions/Insert.h"
 #include <iostream>
 #include <algorithm>
 #include <sstream>
@@ -446,6 +446,25 @@ void DynamicGraph::printInfo() const
         }
         std::cout << std::endl;
     }
+}
+
+int DynamicGraph::getDistance(const Vertex v) const
+{
+    return this->dist[v];
+}
+
+unsigned long DynamicGraph::getComponent(const Vertex v) const
+{
+    return this->components[v];
+}
+
+std::list<Edge> DynamicGraph::getVirtualEdges() const
+{
+    std::list<Edge> virtualEdgesList;
+    for(auto ei = this->virtualEdges.begin(); ei != this->virtualEdges.end(); ++ei) {
+        virtualEdgesList.push_back(*ei);
+    }
+    return virtualEdgesList;
 }
 
 
