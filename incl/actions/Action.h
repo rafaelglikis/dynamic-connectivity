@@ -7,12 +7,10 @@ class DynamicGraph;
 class Action
 {
 protected:
-    DynamicGraph *G;
-    Vertex v;
     std::set<Edge> *rel;
     Edge edge;
 public:
-    Action(DynamicGraph &, Vertex, std::set<Edge>&, Edge);
+    Action(std::set<Edge>&, Edge);
     virtual void undo() = 0;
 };
 

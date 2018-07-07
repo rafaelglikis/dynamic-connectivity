@@ -7,7 +7,7 @@
 class Insert : public Action
 {
 public:
-    Insert(DynamicGraph&, Vertex, std::set<Edge>&, Edge);
+    Insert(std::set<Edge>&, Edge);
     void undo() override;
 };
 

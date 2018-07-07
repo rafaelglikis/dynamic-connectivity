@@ -1,6 +1,6 @@
 #include "../../incl/actions/Insert.h"
-Insert::Insert(DynamicGraph &G, Vertex v, std::set<Edge> &rel, Edge e)
-        : Action (G, v, rel, e) { }
+Insert::Insert(std::set<Edge> &rel, Edge e)
+        : Action (rel, e) { }
 
 void Insert::undo()
 {

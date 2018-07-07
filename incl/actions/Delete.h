@@ -7,7 +7,7 @@
 class Delete : public Action
 {
 public:
-    Delete(DynamicGraph&, Vertex, std::set<Edge>&, Edge);
+    Delete(std::set<Edge>&, Edge);
     void undo() override;
 };
 
