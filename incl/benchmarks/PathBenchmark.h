@@ -5,9 +5,8 @@
 
 class PathBenchmark : public Benchmark
 {
-private:
 public:
-    explicit PathBenchmark(unsigned long numberOfVertices);
+    explicit PathBenchmark(unsigned long);
     void initTime() override;
     void deletionsTime(unsigned long) override;
     void queryTime(unsigned long) override;

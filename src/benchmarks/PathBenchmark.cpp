@@ -1,9 +1,9 @@
 #include <iostream>
 #include "../../incl/benchmarks/PathBenchmark.h"
 
-PathBenchmark::PathBenchmark(unsigned long numberOfVertices)
+PathBenchmark::PathBenchmark(unsigned long vertices)
 {
-    for (Vertex i=0; i<numberOfVertices-1; ++i) {
+    for (Vertex i=0; i<vertices-1; ++i) {
         add_edge(i, i+1, G);
     }
 }
@@ -18,30 +18,30 @@ void PathBenchmark::initTime()
     std::cout << std::fixed << elapsed_secs << " seconds (" << num_vertices(G) << " vertices)" << std::endl;
 }
 
-void PathBenchmark::deletionsTime(unsigned long numberOfDeletions)
+void PathBenchmark::deletionsTime(unsigned long deletions)
 {
-    if (numberOfDeletions > num_vertices(G)/2) {
-        throw std::invalid_argument("Too many deletions");
+    if (deletions > num_vertices(G)/2) {
+        throw std::invalid_argument("PathBenchmark: Too many deletions");
     }
     Vertex offset = 2500;
     clock_t begin = clock();
-    for (Vertex i=offset; i<numberOfDeletions; ++i) {
+    for (Vertex i=offset; i<deletions; ++i) {
         G.deleteEdge(i, i+1);
     }
     clock_t end = clock();
     double elapsed_secs = double(end-begin) / CLOCKS_PER_SEC;
     std::cout << "[i] path deletion time: ";
-    std::cout << std::fixed << elapsed_secs << " seconds (" << numberOfDeletions << " queries)" << std::endl;
+    std::cout << std::fixed << elapsed_secs << " seconds (" << deletions << " deletions)" << std::endl;
 }
 
-void PathBenchmark::queryTime(unsigned long numberOfQueries)
+void PathBenchmark::queryTime(unsigned long queries)
 {
     clock_t begin = clock();
-    for (Vertex i=0; i<numberOfQueries-1; ++i) {
+    for (Vertex i=0; i<queries-1; ++i) {
         G.areConnected(i, i+1);
     }
     clock_t end = clock();
     double elapsed_secs = double(end-begin) / CLOCKS_PER_SEC;
     std::cout << "[i] path query time: ";
-    std::cout << std::fixed << elapsed_secs << " seconds (" << numberOfQueries << " numberOfQueries)" << std::endl;
+    std::cout << std::fixed << elapsed_secs << " seconds (" << queries << " queries)" << std::endl;
 }
