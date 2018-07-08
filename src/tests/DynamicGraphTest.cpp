@@ -37,26 +37,26 @@ void DynamicGraphTest::testInit()
     this->G.init();
 
     // test levels
-    assert(G.getDistance(0)==0);
-    assert(G.getDistance(1)==1);
-    assert(G.getDistance(2)==1);
-    assert(G.getDistance(3)==2);
-    assert(G.getDistance(4)==1);
-    assert(G.getDistance(5)==2);
-    assert(G.getDistance(6)==2);
-    assert(G.getDistance(7)==1);
-    assert(G.getDistance(8)==2);
-    assert(G.getDistance(9)==1);
-    assert(G.getDistance(10)==2);
-    assert(G.getDistance(11)==2);
-    assert(G.getDistance(12)==3);
-    assert(G.getDistance(13)==3);
-    assert(G.getDistance(14)==4);
-    assert(G.getDistance(15)==3);
-    assert(G.getDistance(16)==1);
-    assert(G.getDistance(17)==2);
-    assert(G.getDistance(18)==3);
-    assert(G.getDistance(19)==2);
+    assert(G.getLevel(0)==0);
+    assert(G.getLevel(1)==1);
+    assert(G.getLevel(2)==1);
+    assert(G.getLevel(3)==2);
+    assert(G.getLevel(4)==1);
+    assert(G.getLevel(5)==2);
+    assert(G.getLevel(6)==2);
+    assert(G.getLevel(7)==1);
+    assert(G.getLevel(8)==2);
+    assert(G.getLevel(9)==1);
+    assert(G.getLevel(10)==2);
+    assert(G.getLevel(11)==2);
+    assert(G.getLevel(12)==3);
+    assert(G.getLevel(13)==3);
+    assert(G.getLevel(14)==4);
+    assert(G.getLevel(15)==3);
+    assert(G.getLevel(16)==1);
+    assert(G.getLevel(17)==2);
+    assert(G.getLevel(18)==3);
+    assert(G.getLevel(19)==2);
 
     // test components
     assert(G.getComponent(0)==1);
@@ -101,26 +101,26 @@ void DynamicGraphTest::testNonBreakDelete()
     assert(G.areConnected(16, 17));
 
     // test levels
-    assert(G.getDistance(0)==0);
-    assert(G.getDistance(1)==1);
-    assert(G.getDistance(2)==1);
-    assert(G.getDistance(3)==2);
-    assert(G.getDistance(4)==1);
-    assert(G.getDistance(5)==2);
-    assert(G.getDistance(6)==2);
-    assert(G.getDistance(7)==1);
-    assert(G.getDistance(8)==2);
-    assert(G.getDistance(9)==1);
-    assert(G.getDistance(10)==2);
-    assert(G.getDistance(11)==2);
-    assert(G.getDistance(12)==3);
-    assert(G.getDistance(13)==3);
-    assert(G.getDistance(14)==4);
-    assert(G.getDistance(15)==3);
-    assert(G.getDistance(16)==1);
-    assert(G.getDistance(17)==4);
-    assert(G.getDistance(18)==3);
-    assert(G.getDistance(19)==2);
+    assert(G.getLevel(0)==0);
+    assert(G.getLevel(1)==1);
+    assert(G.getLevel(2)==1);
+    assert(G.getLevel(3)==2);
+    assert(G.getLevel(4)==1);
+    assert(G.getLevel(5)==2);
+    assert(G.getLevel(6)==2);
+    assert(G.getLevel(7)==1);
+    assert(G.getLevel(8)==2);
+    assert(G.getLevel(9)==1);
+    assert(G.getLevel(10)==2);
+    assert(G.getLevel(11)==2);
+    assert(G.getLevel(12)==3);
+    assert(G.getLevel(13)==3);
+    assert(G.getLevel(14)==4);
+    assert(G.getLevel(15)==3);
+    assert(G.getLevel(16)==1);
+    assert(G.getLevel(17)==4);
+    assert(G.getLevel(18)==3);
+    assert(G.getLevel(19)==2);
 
     // test components nothing changes
     assert(G.getComponent(0)==1);
@@ -165,26 +165,26 @@ void DynamicGraphTest::testBreakDelete()
     assert(!G.areConnected(7,8));
 
     // test levels
-    assert(G.getDistance(0)==0);
-    assert(G.getDistance(1)==1);
-    assert(G.getDistance(2)==1);
-    assert(G.getDistance(3)==2);
-    assert(G.getDistance(4)==1);
-    assert(G.getDistance(5)==2);
-    assert(G.getDistance(6)==2);
-    assert(G.getDistance(7)==1);
-    assert(G.getDistance(8)==2);
-    assert(G.getDistance(9)==1);
-    assert(G.getDistance(10)==2);
-    assert(G.getDistance(11)==2);
-    assert(G.getDistance(12)==3);
-    assert(G.getDistance(13)==3);
-    assert(G.getDistance(14)==4);
-    assert(G.getDistance(15)==3);
-    assert(G.getDistance(16)==1);
-    assert(G.getDistance(17)==4);
-    assert(G.getDistance(18)==3);
-    assert(G.getDistance(19)==2);
+    assert(G.getLevel(0)==0);
+    assert(G.getLevel(1)==1);
+    assert(G.getLevel(2)==1);
+    assert(G.getLevel(3)==2);
+    assert(G.getLevel(4)==1);
+    assert(G.getLevel(5)==2);
+    assert(G.getLevel(6)==2);
+    assert(G.getLevel(7)==1);
+    assert(G.getLevel(8)==2);
+    assert(G.getLevel(9)==1);
+    assert(G.getLevel(10)==2);
+    assert(G.getLevel(11)==2);
+    assert(G.getLevel(12)==3);
+    assert(G.getLevel(13)==3);
+    assert(G.getLevel(14)==4);
+    assert(G.getLevel(15)==3);
+    assert(G.getLevel(16)==1);
+    assert(G.getLevel(17)==4);
+    assert(G.getLevel(18)==3);
+    assert(G.getLevel(19)==2);
 
     // test components
 
@@ -250,25 +250,25 @@ void DynamicGraphTest::testBig()
     G.deleteEdge(6, 5);
 
     // test levels
-    assert(G.getDistance(0)==0);
-    assert(G.getDistance(2)==1);
-    assert(G.getDistance(3)==2);
-    assert(G.getDistance(4)==1);
-    assert(G.getDistance(5)==3);
-    assert(G.getDistance(6)==2);
-    assert(G.getDistance(7)==1);
-    assert(G.getDistance(8)==2);
-    assert(G.getDistance(9)==1);
-    assert(G.getDistance(10)==3);
-    assert(G.getDistance(11)==2);
-    assert(G.getDistance(12)==4);
-    assert(G.getDistance(13)==3);
-    assert(G.getDistance(14)==4);
-    assert(G.getDistance(15)==5);
-    assert(G.getDistance(16)==1);
-    assert(G.getDistance(17)==4);
-    assert(G.getDistance(18)==3);
-    assert(G.getDistance(19)==2);
+    assert(G.getLevel(0)==0);
+    assert(G.getLevel(2)==1);
+    assert(G.getLevel(3)==2);
+    assert(G.getLevel(4)==1);
+    assert(G.getLevel(5)==3);
+    assert(G.getLevel(6)==2);
+    assert(G.getLevel(7)==1);
+    assert(G.getLevel(8)==2);
+    assert(G.getLevel(9)==1);
+    assert(G.getLevel(10)==3);
+    assert(G.getLevel(11)==2);
+    assert(G.getLevel(12)==4);
+    assert(G.getLevel(13)==3);
+    assert(G.getLevel(14)==4);
+    assert(G.getLevel(15)==5);
+    assert(G.getLevel(16)==1);
+    assert(G.getLevel(17)==4);
+    assert(G.getLevel(18)==3);
+    assert(G.getLevel(19)==2);
 
     // test components
     assert(G.getComponent(0)==11);

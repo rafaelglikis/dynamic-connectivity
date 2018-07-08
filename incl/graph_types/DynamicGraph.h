@@ -6,11 +6,18 @@
 #include <set>
 class Action;
 
+/**
+ * DynamicGraph
+ * for Even & Shiloach [ES81] Decremental Dynamic Algorithm
+ * Maintains the a dynamic "BFS" structure in order to answer
+ * if two vertices are in the same connected component in constant time.
+ *
+ */
 class DynamicGraph : public UndirectedGraph
 {
 private:
     std::vector<unsigned long> components;
-    std::vector<unsigned long > dist;
+    std::vector<unsigned long > level;
     std::set<Edge> virtualEdges;
     unsigned long nextComponent = 0;
     std::vector<Relatives> relatives;
@@ -42,7 +49,7 @@ public:
     void showVirtualEdges();
 
     // getters
-    int getDistance(Vertex v) const;
+    int getLevel(Vertex v) const;
     unsigned long getComponent(Vertex v) const;
     std::list<Edge> getVirtualEdges() const;
 

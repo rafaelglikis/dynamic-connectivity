@@ -6,10 +6,16 @@
 #include <sstream>
 #include <omp.h>
 
+/**
+ * Initialization
+ * Creation of the first BFS structure starting always from vertex 0.
+ * init components level and relatives vectors.
+ * init relatives struct for each note.
+ */
 void DynamicGraph::init()
 {
     this->components.resize(num_vertices(*this));
-    this->dist.resize(num_vertices(*this));
+    this->level.resize(num_vertices(*this));
     this->relatives.resize(num_vertices(*this));
 
     buildBFSStructure(0);
@@ -17,30 +23,44 @@ void DynamicGraph::init()
     this->isInitialized = true;
 }
 
+/**
+ * Creates the first bfs structure starting from vertex s.
+ * @param s (start vertex)
+ */
 void DynamicGraph::buildBFSStructure(const Vertex &s)
 {
     std::vector<bool> visited(boost::num_vertices(*this));
     this->nextComponent++;
     this->bfs(s, visited, 0);
 
+    // While not visited notes exist
     while(std::find(visited.begin(), visited.end(), 0) != visited.end() ) {
-        // Add Virtual Edges
-        for(Vertex i=1; i<dist.size(); ++i ) {
+        // For each note not visited yet
+        for(Vertex i=1; i<level.size(); ++i ) {
+            // Add a virtual edge
             if(!visited[i]){
                 boost::add_edge(0, i, *this);
                 this->virtualEdges.insert(edge(0,i,*this).first);
-
                 this->nextComponent++;
+
+                // And continue scanning from here
                 this->bfs(i, visited, 1);
             }
         }
     }
 }
 
-void DynamicGraph::bfs(const Vertex &s, std::vector<bool> &visited, const int startingDistance)
+/**
+ * Runs breath first search algorithm on DynamicGraph
+ * starting from note s, and level startingLevel
+ * @param s (start vertex)
+ * @param visited (vector with vertex visited status)
+ * @param startingLevel (level to start bfs)
+ */
+void DynamicGraph::bfs(const Vertex &s, std::vector<bool> &visited, const int startingLevel)
 {
     std::list<Vertex> queue;
-    this->dist[s] = startingDistance;
+    this->level[s] = startingLevel;
     visited[s]=true;
     this->components[s] = this->nextComponent;
     queue.push_back(s);
@@ -54,7 +74,7 @@ void DynamicGraph::bfs(const Vertex &s, std::vector<bool> &visited, const int st
         for(boost::tie(ei, ei_end) = out_edges(v, *this); ei != ei_end; ++ei) {
             Vertex u = target(*ei, *this);
             if(!visited[u]){
-                dist[u] = this->dist[v]+1;
+                level[u] = this->level[v]+1;
                 this->components[u] = this->nextComponent;
                 visited[u]=true;
                 queue.push_back(u);
@@ -63,25 +83,31 @@ void DynamicGraph::bfs(const Vertex &s, std::vector<bool> &visited, const int st
     }
 }
 
+/**
+ * Updates relatives struct for each vertex.
+ */
 void DynamicGraph::updateRelatives()
 {
-    for(Vertex v = 0; v < this->dist.size(); v++) {
+    for(Vertex v = 0; v < this->level.size(); v++) {
         OutEdgeIterator ei, ei_end;
         for(boost::tie(ei, ei_end) = out_edges(v, *this); ei != ei_end; ++ei) {
             Vertex u = target(*ei, *this);
-            if(this->dist[v] == this->dist[u] + 1 ) {
+            if(this->level[v] == this->level[u] + 1 ) {
                 this->relatives[v].a_pred.insert(*ei);
             }
-            else if(this->dist[v] == this->dist[u]) {
+            else if(this->level[v] == this->level[u]) {
                 this->relatives[v].b_sibl.insert(*ei);
             }
-            else if(this->dist[v] == this->dist[u] - 1 ) {
+            else if(this->level[v] == this->level[u] - 1 ) {
                 this->relatives[v].c_succ.insert(*ei);
             }
         }
     }
 }
 
+/**
+ * Hides all virtual edges in order to use Dynamic graph for other purposes.
+ */
 void DynamicGraph::hideVirtualEdges()
 {
     for(auto ei = this->virtualEdges.begin(); ei != virtualEdges.end(); ++ei) {
@@ -90,6 +116,9 @@ void DynamicGraph::hideVirtualEdges()
     }
 }
 
+/**
+ * Brings back virtual edges in order to make a deletion.
+ */
 void DynamicGraph::showVirtualEdges()
 {
     for(auto ei = this->virtualEdges.begin(); ei != virtualEdges.end(); ++ei) {
@@ -99,6 +128,15 @@ void DynamicGraph::showVirtualEdges()
     }
 }
 
+/**
+ * Answers the question:
+ * Are vertices v and u in the same connected component?
+ * in constant time.
+ * Initialization required.
+ * @param v (vertex)
+ * @param u (vertex)
+ * @return true if v and u in the same connected component.
+ */
 bool DynamicGraph::areConnected(const Vertex &v, const Vertex &u)
 {
     if(!this->isInitialized) {
@@ -107,6 +145,12 @@ bool DynamicGraph::areConnected(const Vertex &v, const Vertex &u)
     return this->components[v] == this->components[u];
 }
 
+/**
+ * Deletes the edge connecting vertices v and u.
+ * Initialization required.
+ * @param v (vertex)
+ * @param u (vertex)
+ */
 void DynamicGraph::deleteEdge(const Vertex &v, const Vertex &u)
 {
     if(!this->isInitialized) {
@@ -122,6 +166,17 @@ void DynamicGraph::deleteEdge(const Vertex &v, const Vertex &u)
     this->handleDeletion(e);
 }
 
+/**
+ * Handles the deletion.
+ * Running to threads.
+ *  - Thread A: detects if the deletion breaks a component. O(|E|log(|E|))
+ *  - Thread B: detects if the deletion does not break a component. O(|E|.|V|)
+ * When one of the previews threads finish positively both threads stop.
+ * If the component break create a new component with the smaller subgraph.
+ * Replace the deleted edge with a virtual one.
+ *
+ * @param e (edge)
+ */
 void DynamicGraph::handleDeletion(Edge e)
 {
     Vertex v = source(e, *this);
@@ -145,9 +200,18 @@ void DynamicGraph::handleDeletion(Edge e)
     }
 }
 
+/**
+ * Thread A
+ * Check if the component breaks after the deletion of the
+ * edge connecting vertices v and u.
+ * If the component break create a new component with the smaller subgraph
+ * and stop thread B.
+ * @param v (vertex)
+ * @param u (vertex)
+ * @return true if the components break
+ */
 bool DynamicGraph::checkComponentBreak(const Vertex &v, const Vertex &u)
 {
-    // Using bidirectional BFS
     std::list<Vertex> queueV;
     std::list<Vertex> queueU;
     std::vector<bool> visitedV(boost::num_vertices(*this), false);
@@ -155,19 +219,20 @@ bool DynamicGraph::checkComponentBreak(const Vertex &v, const Vertex &u)
     std::list<Vertex> visitedListV;
     std::list<Vertex> visitedListU;
 
+    // Using bidirectional BFS
     visitedV[v]=true;
     visitedU[u]=true;
     queueV.push_back(v);
     queueU.push_back(u);
     visitedListV.push_back(v);
     visitedListU.push_back(u);
-
     while(!queueV.empty() && !queueU.empty()) {
         if (this->halt) {
             return false;
         }
 
-        if(!this->bdbfsStep(queueV, visitedV, visitedU, visitedListV) || this->halt) {
+        if(!this->bdbfsStep(queueV, visitedV, visitedU, visitedListV)
+           || this->halt) {
             return false;
         }
 
@@ -177,7 +242,8 @@ bool DynamicGraph::checkComponentBreak(const Vertex &v, const Vertex &u)
             break;
         }
 
-        if(!this->bdbfsStep(queueU, visitedU, visitedV, visitedListU) || this->halt) {
+        if(!this->bdbfsStep(queueU, visitedU, visitedV, visitedListU)
+           || this->halt) {
             return false;
         }
 
@@ -190,6 +256,14 @@ bool DynamicGraph::checkComponentBreak(const Vertex &v, const Vertex &u)
     return true;
 }
 
+/**
+ * A step of bidirectional breath first search algorithm used in thread A.
+ * @param queue bdbfs Q
+ * @param visitedV vertices vector - true if  visited from vertex v
+ * @param visitedU vertices vector - true if visited from vertex u
+ * @param visitedList list of vertices visited from vertex v
+ * @return false if reaches a vertex known by the oposite vertex.
+ */
 bool DynamicGraph::bdbfsStep(std::list<Vertex>& queue, std::vector<bool>& visitedV,
                std::vector<bool>& visitedU, std::list<Vertex>& visitedList)
 {
@@ -211,6 +285,10 @@ bool DynamicGraph::bdbfsStep(std::list<Vertex>& queue, std::vector<bool>& visite
     return true;
 }
 
+/**
+ * Updates component label for each vertex in visited list
+ * @param visited (vertices to change component)
+ */
 void DynamicGraph::updateVisitedComponents(const std::list<Vertex>& visited)
 {
     this->nextComponent++;
@@ -219,10 +297,34 @@ void DynamicGraph::updateVisitedComponents(const std::list<Vertex>& visited)
     }
 }
 
+/**
+ * Thread B
+ * Checks if the deletion of the edge e does not break the component.
+ * If does not, then stop thread A.
+ * Changes the levels relatives structure for some vertices
+ * in order to keep the BFS structure.
+ * Cases:
+ * Case 1: v and u are on the same level
+ *  - The edge is simply deleted from b_sibl(u) and b_sibl(v),
+ *  - halt return true
+ * Case 2: v and u are on different levels
+ *  -  We remove e from, c_succ(u) and a_pred(v).
+ * Case 2.1: a_pred(v) is not empty
+ *  - halt and return true
+ * Case 2.2 a_pred(v) is empty
+ * - drop level of v.  its drop may cause a whole avalanche (see below).
+ * - if the avalanche reaches the end halt and return true.
+ * - if thread A finishes first then the DynamicGraph BFS structure
+ *   returns to the initial state (undo all changes one by one)
+ * @param v (vertex)
+ * @param u (vertex)
+ * @param e (edge)
+ * @return true if the deletion does not break the component.
+ */
 bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
 {
     // Case 1: v and u are on the same level
-    if (this->dist[v]==this->dist[u]) {
+    if (this->level[v]==this->level[u]) {
         this->halt = true;
         this->relatives[v].b_sibl.erase(e);
         this->relatives[u].b_sibl.erase(e);
@@ -230,11 +332,11 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
     }
 
     // Case 2: v and u are on different levels
-    if (this->dist[v]!=this->dist[u]) {
-        std::list<Action*> actions;
-        std::list<Vertex> incVertices;
+    if (this->level[v]!=this->level[u]) {
+        std::list<Action*> actions; // changes stack
+        std::list<Vertex> incVertices; // vertices dropped stack (each vertex multible times)
         // For Generality u in Li-1 and v Li
-        if (this->dist[v] < this->dist[u]) {
+        if (this->level[v] < this->level[u]) {
             Vertex tmp = v;
             v = u;
             u = tmp;
@@ -284,12 +386,23 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
     }
 }
 
+/**
+ * Thread B
+ * Case 2: v and u are on different levels
+ * Case 2.2 a_pred(v) is empty
+ * Step of the avalanche.
+ * Steps described below.
+ * @param w (vertex)
+ * @param queue (vertices has to drop level)
+ * @param actions (the action stack for undo)
+ * @param incVertices (vector of vertices that droped level for undo)
+ */
 void DynamicGraph::dropLevel(Vertex w, std::list<Vertex> &queue,
                              std::list<Action *> &actions, std::list<Vertex> &incVertices)
 {
     // Remove w from its level (say, Lj), and put it in the next level (Lj+1)
     incVertices.push_front(w);
-    dist[w]++;
+    level[w]++;
 
     // For each edge e (w---w') in b_sibl(w)
     for(auto ei = relatives[w].b_sibl.begin(); ei != relatives[w].b_sibl.end(); ++ei) {
@@ -349,6 +462,11 @@ void DynamicGraph::dropLevel(Vertex w, std::list<Vertex> &queue,
     }
 }
 
+/**
+ * Undo all actions given as parameters
+ * @param actions (insert and delete actions)
+ * @param incVertices (vertices dropped)
+ */
 void DynamicGraph::rollBack(std::list<Action*> &actions, std::list<Vertex>& incVertices)
 {
     while (!actions.empty()) {
@@ -361,12 +479,12 @@ void DynamicGraph::rollBack(std::list<Action*> &actions, std::list<Vertex>& incV
     while(!incVertices.empty()) {
         Vertex v = incVertices.front();
         incVertices.pop_front();
-        this->dist[v]--;
+        this->level[v]--;
     }
 }
 
 /**
- * Prints graph in GraphViz
+ * Prints graph in GraphViz format
  * https://dreampuf.github.io/GraphvizOnline/
  */
 void DynamicGraph::visualize() const
@@ -414,10 +532,10 @@ void DynamicGraph::visualize() const
  */
 void DynamicGraph::printInfo() const
 {
-    for (Vertex v = 0; v < this->dist.size(); v++) {
+    for (Vertex v = 0; v < this->level.size(); v++) {
         std::cout << "Vertex " << v  << std::endl;
         std::cout << " - component " << this->components[v] << std::endl;
-        std::cout << " - dist " << this->dist[v] << std::endl;
+        std::cout << " - level " << this->level[v] << std::endl;
         std::cout << " - pred: ";
         for (auto ei = this->relatives[v].a_pred.begin(); ei != this->relatives[v].a_pred.end(); ei++) {
             Vertex u = source(*ei, *this);
@@ -454,16 +572,30 @@ void DynamicGraph::printInfo() const
     }
 }
 
-int DynamicGraph::getDistance(const Vertex v) const
+/**
+ * Returns the level of the given vertex.
+ * @param v vertex
+ * @return level
+ */
+int DynamicGraph::getLevel(Vertex v) const
 {
-    return this->dist[v];
+    return this->level[v];
 }
 
+/**
+ * Returns the component of the given vertex.
+ * @param v vertex
+ * @return level
+ */
 unsigned long DynamicGraph::getComponent(const Vertex v) const
 {
     return this->components[v];
 }
 
+/**
+ * Returns all virtual edges
+ * @return virtualEdgesList
+ */
 std::list<Edge> DynamicGraph::getVirtualEdges() const
 {
     std::list<Edge> virtualEdgesList;
