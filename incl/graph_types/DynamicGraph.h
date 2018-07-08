@@ -10,7 +10,7 @@ class DynamicGraph : public UndirectedGraph
 {
 private:
     std::vector<unsigned long> components;
-    std::vector<int> dist;
+    std::vector<unsigned long > dist;
     std::set<Edge> virtualEdges;
     unsigned long nextComponent = 0;
     std::vector<Relatives> relatives;
