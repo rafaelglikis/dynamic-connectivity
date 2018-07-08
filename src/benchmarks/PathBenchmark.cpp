@@ -1,6 +1,5 @@
 #include <iostream>
 #include "../../incl/benchmarks/PathBenchmark.h"
-#include "../../incl/utilities/Utilities.h"
 
 PathBenchmark::PathBenchmark(unsigned long vertices)
 {

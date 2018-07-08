@@ -9,7 +9,7 @@ class Benchmark
 protected:
     DynamicGraph G;
     double getInitTime();
-    double getDeletionsTime(unsigned long);
+    virtual double getDeletionsTime(unsigned long);
     double getQueryTime(unsigned long);
 public:
     virtual void run(unsigned long, unsigned long) = 0;
