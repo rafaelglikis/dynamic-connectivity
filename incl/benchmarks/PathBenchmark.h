@@ -7,9 +7,7 @@ class PathBenchmark : public Benchmark
 {
 public:
     explicit PathBenchmark(unsigned long);
-    void initTime() override;
-    void deletionsTime(unsigned long) override;
-    void queryTime(unsigned long) override;
+    void run(unsigned long, unsigned long) override;
 };
 
 

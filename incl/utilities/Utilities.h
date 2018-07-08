@@ -1,11 +1,12 @@
 #ifndef DYNAMIC_CONNECTIVITY_UTILITIES_H
 #define DYNAMIC_CONNECTIVITY_UTILITIES_H
 
-typedef long long int big_int_t;
+#include "../graph_types/UndirectedGraph.h"
+
 class Utilities
 {
 public:
-    static big_int_t randomRange(big_int_t min, big_int_t max);
+    static Vertex randomRange(Vertex min, Vertex max);
 };
 
 #endif //DYNAMIC_CONNECTIVITY_UTILITIES_H

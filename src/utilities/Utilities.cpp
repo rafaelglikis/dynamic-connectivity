@@ -1,8 +1,9 @@
 #include <cstdlib>
 #include <ctime>
 #include "../../incl/utilities/Utilities.h"
+#include "../../incl/graph_types/UndirectedGraph.h"
 
-big_int_t Utilities::randomRange(big_int_t min, big_int_t max)
+Vertex Utilities::randomRange(Vertex min, Vertex max)
 {
     static bool first = true;
     if (first) {

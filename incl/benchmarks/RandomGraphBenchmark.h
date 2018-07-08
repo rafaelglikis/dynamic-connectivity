@@ -7,9 +7,7 @@ class RandomGraphBenchmark : public Benchmark
 {
 public:
     explicit RandomGraphBenchmark(unsigned long, unsigned int);
-    void initTime() override;
-    void deletionsTime(unsigned long) override;
-    void queryTime(unsigned long) override;
+    void run(unsigned long, unsigned long) override;
 };
 
 

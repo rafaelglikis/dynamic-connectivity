@@ -8,10 +8,12 @@ class Benchmark
 {
 protected:
     DynamicGraph G;
+    double getInitTime();
+    double getDeletionsTime(unsigned long);
+    double getQueryTime(unsigned long);
 public:
-    virtual void initTime() = 0;
-    virtual void deletionsTime(unsigned long) = 0;
-    virtual void queryTime(unsigned long) = 0;
+    virtual void run(unsigned long, unsigned long) = 0;
+
 };
 
 
