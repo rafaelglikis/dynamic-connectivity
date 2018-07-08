@@ -3,17 +3,18 @@
 #include "../../incl/utilities/Utilities.h"
 
 
-TreeBenchmark::TreeBenchmark(unsigned long depth)
+TreeBenchmark::TreeBenchmark(unsigned long vertices)
 {
-    unsigned long edges=2;
-    for (unsigned long i=3; i<depth; ++i) {
-        edges = edges*2 + 2;
-    }
-
     int offset = 1;
-    for (Vertex i=0; i<=edges; ++i) {
+    for (Vertex i=0; i<=vertices; ++i) {
+        if (offset+i > vertices) {
+            break;
+        }
         add_edge(i, i+offset, G);
         offset++;
+        if (offset+i > vertices) {
+            break;
+        }
         add_edge(i, i+offset, G);
     }
 }

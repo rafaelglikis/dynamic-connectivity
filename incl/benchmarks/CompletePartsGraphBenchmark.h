@@ -8,7 +8,7 @@ class CompletePartsGraphBenchmark : public Benchmark
 {
 private:
     std::set<Edge> deletionSet;
-    double getDeletionsTime(unsigned long) override ;
+    double getDeletionsTime(unsigned long) override;
 public:
     explicit CompletePartsGraphBenchmark(int completeSubgraphs, int vertices);
     void run(unsigned long, unsigned long) override;

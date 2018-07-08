@@ -17,12 +17,12 @@ int main()
     actionTest.run();
     graphTest.run();
 
-    // Benchmark
+    // Benchmarks
     PathBenchmark pathBenchmark(10000);
     pathBenchmark.run(5000, 5000);
-    RandomGraphBenchmark randomGraphBenchmark(10000, 30000);
+    RandomGraphBenchmark randomGraphBenchmark(10000, 300000);
     randomGraphBenchmark.run(5000, 5000);
-    TreeBenchmark treeBenchmark(20);
+    TreeBenchmark treeBenchmark(10000);
     treeBenchmark.run(5000, 5000);
     CompletePartsGraphBenchmark completePartsGraphBenchmark(100, 100);
     completePartsGraphBenchmark.run(5000, 5000);
