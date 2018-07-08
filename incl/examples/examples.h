@@ -1,6 +1,6 @@
 #ifndef DYNAMIC_CONNECTIVITY_EXAMPLES_H
 #define DYNAMIC_CONNECTIVITY_EXAMPLES_H
 
-void example();
+void runExample();
 
 #endif //DYNAMIC_CONNECTIVITY_EXAMPLES_H

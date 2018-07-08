@@ -1,7 +1,7 @@
 #include <iostream>
 #include "../../incl/graph_types/DynamicGraph.h"
 
-void example()
+void runExample()
 {
     DynamicGraph G;
 
@@ -31,11 +31,15 @@ void example()
     add_edge(18, 17, G);
     add_edge(18, 19, G);
 
+    G.init();
+
     G.printInfo();
     G.visualize();
 
+
     G.deleteEdge(7, 8);
 
+    std::cout << "Graph after deletion: " << std::endl;
     G.printInfo();
     G.visualize();
 

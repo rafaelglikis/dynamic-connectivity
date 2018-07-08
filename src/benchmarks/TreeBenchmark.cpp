@@ -26,7 +26,7 @@ void TreeBenchmark::run(unsigned long deletions, unsigned long queries)
     }
 
     std::cout << "[i] tree initialization time: " << std::fixed << this->getInitTime();
-    std::cout << " seconds (" << num_vertices(G) << " vertices)" << std::endl;
+    std::cout << " seconds (" << num_vertices(G) << " vertices " << num_edges(G) << " edges)" << std::endl;
     std::cout << "[i] tree deletion time: " << std::fixed << this->getDeletionsTime(deletions);
     std::cout << " seconds (" << deletions << " deletions)" << std::endl;
     std::cout << "[i] tree query time: ";

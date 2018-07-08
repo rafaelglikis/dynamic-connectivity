@@ -6,7 +6,7 @@
 class RandomGraphBenchmark : public Benchmark
 {
 public:
-    explicit RandomGraphBenchmark(unsigned long, unsigned int);
+    explicit RandomGraphBenchmark(unsigned long, unsigned long);
     void run(unsigned long, unsigned long) override;
 };
 

@@ -4,13 +4,13 @@
 
 #include "Benchmark.h"
 
-class CompletePartsGraphBenchmark : public Benchmark
+class PathCompleteGraphsBenchmark : public Benchmark
 {
 private:
     std::set<Edge> deletionSet;
     double getDeletionsTime(unsigned long) override;
 public:
-    explicit CompletePartsGraphBenchmark(int completeSubgraphs, int vertices);
+    explicit PathCompleteGraphsBenchmark(int completeSubgraphs, int vertices);
     void run(unsigned long, unsigned long) override;
 };
 
