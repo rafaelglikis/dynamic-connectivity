@@ -3,6 +3,10 @@
 
 #include "Benchmark.h"
 
+/**
+ * PathBenchmark
+ * Creates a path graph and runs the benchmark.
+ */
 class PathBenchmark : public Benchmark
 {
 public:

@@ -2,7 +2,10 @@
 #include "../../incl/benchmarks/TreeBenchmark.h"
 #include "../../incl/utilities/Utilities.h"
 
-
+/**
+ * Creates a tree graph of @param(vertices) vertices
+ * @param vertices (graph vertices)
+ */
 TreeBenchmark::TreeBenchmark(unsigned long vertices)
 {
     int offset = 1;
@@ -19,6 +22,13 @@ TreeBenchmark::TreeBenchmark(unsigned long vertices)
     }
 }
 
+/**
+ * Runs getInitTime(), getDeletionsTime(deletions), getQueryTime(queries) for the specified parameters
+ * and prints the result.
+ * throws invalid_argument exepion if the deletions are too many
+ * @param deletions (number of deletions)
+ * @param queries (number of queries)
+ */
 void TreeBenchmark::run(unsigned long deletions, unsigned long queries)
 {
     if (deletions > num_edges(G)) {

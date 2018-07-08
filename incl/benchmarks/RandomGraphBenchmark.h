@@ -3,6 +3,10 @@
 
 #include "Benchmark.h"
 
+/**
+ * RandomGraphBenchmark
+ * Creates a random graph and runs the benchmark.
+ */
 class RandomGraphBenchmark : public Benchmark
 {
 public:

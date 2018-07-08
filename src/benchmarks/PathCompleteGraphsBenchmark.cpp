@@ -1,6 +1,12 @@
 #include <iostream>
 #include "../../incl/benchmarks/PathCompleteGraphsBenchmark.h"
 
+/**
+ * Creates a path of @param(completeSubgraphs) complete graphs
+ * with @param(vertices) vertices each.
+ * @param completeSubgraphs
+ * @param vertices
+ */
 PathCompleteGraphsBenchmark::PathCompleteGraphsBenchmark(int completeSubgraphs, int vertices)
 {
 
@@ -24,6 +30,13 @@ PathCompleteGraphsBenchmark::PathCompleteGraphsBenchmark(int completeSubgraphs, 
     }
 }
 
+/**
+ * Runs getInitTime(), getDeletionsTime(deletions), getQueryTime(queries) for the specified parameters
+ * and prints the result.
+ * throws invalid_argument exepion if the deletions are too many
+ * @param deletions (number of deletions)
+ * @param queries (number of queries)
+ */
 void PathCompleteGraphsBenchmark::run(unsigned long deletions, unsigned long queries)
 {
     if (deletions > num_edges(G)) {
@@ -38,6 +51,13 @@ void PathCompleteGraphsBenchmark::run(unsigned long deletions, unsigned long que
     std::cout << std::fixed << this->getQueryTime(queries) << " seconds (" << queries << " queries)" << std::endl;
 }
 
+/**
+ * Override of getDeletionsTime()
+ * This method deletes the edges connecting the complete subgraphs (deletionSet) first
+ * in order to get worse times.
+ * @param deletions (number of deletions)
+ * @return time
+ */
 double PathCompleteGraphsBenchmark::getDeletionsTime(unsigned long deletions)
 {
     int deletionsCount = 0;
@@ -54,6 +74,7 @@ double PathCompleteGraphsBenchmark::getDeletionsTime(unsigned long deletions)
 
     std::random_shuffle(edges.begin(), edges.end());
 
+    // put the edges connecting the complete subgraphs at the beginning
     int counter = 0;
     for (auto i=this->deletionSet.begin(); i!=this->deletionSet.end(); ++i) {
         if (counter>=deletions) break;

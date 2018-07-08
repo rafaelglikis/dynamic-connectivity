@@ -1,6 +1,9 @@
 #include <iostream>
 #include "../../incl/graph_types/DynamicGraph.h"
 
+/**
+ * Runs an example
+ */
 void runExample()
 {
     DynamicGraph G;

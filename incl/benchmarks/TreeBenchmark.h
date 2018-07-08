@@ -3,6 +3,10 @@
 
 #include "Benchmark.h"
 
+/**
+ * TreeBenchmark
+ * Creates a tree graph and runs the benchmark.
+ */
 class TreeBenchmark : public Benchmark
 {
 public:

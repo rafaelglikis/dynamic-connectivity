@@ -4,6 +4,11 @@
 
 #include "../graph_types/DynamicGraph.h"
 
+/**
+ * Abstract Benchmark
+ * Mesures the time of Dynamic Graph tasks (init delete query)
+ * and prints the result (run method).
+ */
 class Benchmark
 {
 protected:

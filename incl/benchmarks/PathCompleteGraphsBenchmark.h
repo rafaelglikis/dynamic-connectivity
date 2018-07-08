@@ -4,6 +4,10 @@
 
 #include "Benchmark.h"
 
+/**
+ * PathCompleteGraphsBenchmark
+ * Creates a path of complete graphs and runs the benchmark.
+ */
 class PathCompleteGraphsBenchmark : public Benchmark
 {
 private:

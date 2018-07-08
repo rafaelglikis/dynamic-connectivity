@@ -1,6 +1,10 @@
 #include <iostream>
 #include "../../incl/benchmarks/PathBenchmark.h"
 
+/**
+ * Creates a path graph of @param(vertices) vertices
+ * @param vertices (graph vertices)
+ */
 PathBenchmark::PathBenchmark(unsigned long vertices)
 {
     for (Vertex i=0; i<vertices-1; ++i) {
@@ -8,6 +12,13 @@ PathBenchmark::PathBenchmark(unsigned long vertices)
     }
 }
 
+/**
+ * Runs getInitTime(), getDeletionsTime(deletions), getQueryTime(queries) for the specified parameters
+ * and prints the result.
+ * throws invalid_argument exepion if the deletions are too many
+ * @param deletions (number of deletions)
+ * @param queries (number of queries)
+ */
 void PathBenchmark::run(unsigned long deletions, unsigned long queries)
 {
     if (deletions > num_edges(G)) {

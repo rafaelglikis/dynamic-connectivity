@@ -1,6 +1,10 @@
 #include "../../incl/benchmarks/Benchmark.h"
 #include "../../incl/utilities/Utilities.h"
 
+/**
+ * Mesures initialization time
+ * @return initialization time
+ */
 double Benchmark::getInitTime()
 {
     clock_t begin = clock();
@@ -10,11 +14,16 @@ double Benchmark::getInitTime()
     return elapsed_secs;
 }
 
+/**
+ * Mesures time for @param(deletions) number of deleions
+ * @return time
+ */
 double Benchmark::getDeletionsTime(unsigned long deletions)
 {
     int deletionsCount = 0;
     std::vector<Edge> edges;
 
+    // get deletions number of edges
     EdgeIterator ei, ei_end;
     for(boost::tie(ei, ei_end) = boost::edges(G); ei != ei_end; ++ei) {
         edges.push_back(*ei);
@@ -24,6 +33,7 @@ double Benchmark::getDeletionsTime(unsigned long deletions)
         }
     }
 
+    // shuffle them
     std::random_shuffle(edges.begin(), edges.end());
 
     clock_t begin = clock();
@@ -34,6 +44,10 @@ double Benchmark::getDeletionsTime(unsigned long deletions)
     double elapsed_secs = double(end-begin) / CLOCKS_PER_SEC;
 }
 
+/**
+ * Mesures time for @param(queries) number of queries
+ * @return time
+ */
 double Benchmark::getQueryTime(unsigned long queries)
 {
     Vertex limit = num_vertices(G) - 1;

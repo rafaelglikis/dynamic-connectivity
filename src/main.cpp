@@ -8,7 +8,7 @@
 #include "../incl/benchmarks/RandomGraphBenchmark.h"
 #include "../incl/benchmarks/TreeBenchmark.h"
 #include "../incl/benchmarks/PathCompleteGraphsBenchmark.h"
-#include <math.h>
+#include <cmath>
 
 int main(int argc, char* argv[])
 {
