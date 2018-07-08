@@ -14,6 +14,7 @@ void DynamicGraph::init()
 
     buildBFSStructure(0);
     this->updateRelatives();
+    this->isInitialized = true;
 }
 
 void DynamicGraph::buildBFSStructure(const Vertex &s)
@@ -100,20 +101,25 @@ void DynamicGraph::showVirtualEdges()
 
 bool DynamicGraph::areConnected(const Vertex &v, const Vertex &u)
 {
+    if(!this->isInitialized) {
+        throw std::runtime_error("Dynamic Graph not initialized!");
+    }
     return this->components[v] == this->components[u];
 }
 
 void DynamicGraph::deleteEdge(const Vertex &v, const Vertex &u)
 {
-    bool edgeExist = edge(v,u,*this).second;
-    if (edgeExist) {
-        Edge e = edge(v,u,*this).first;
-        boost::remove_edge(e, *this);
-        this->handleDeletion(e);
+    if(!this->isInitialized) {
+        throw std::runtime_error("Dynamic Graph not initialized!");
     }
-    else {
+
+    bool edgeExist = edge(v,u,*this).second;
+    if (!edgeExist) {
         throw std::invalid_argument("Edge does not exist");
     }
+    Edge e = edge(v,u,*this).first;
+    boost::remove_edge(e, *this);
+    this->handleDeletion(e);
 }
 
 void DynamicGraph::handleDeletion(Edge e)

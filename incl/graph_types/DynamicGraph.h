@@ -15,6 +15,7 @@ private:
     unsigned long nextComponent = 0;
     std::vector<Relatives> relatives;
     bool halt = false;
+    bool isInitialized = false;
 
     // Initialization Operations
     void buildBFSStructure(const Vertex&);
