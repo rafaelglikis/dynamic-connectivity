@@ -3,6 +3,9 @@
 #include "../../incl/actions/Insert.h"
 #include "../../incl/actions/Delete.h"
 
+/**
+ * Creates a minimal dynamic graph structure to operate on.
+ */
 ActionTest::ActionTest()
 {
     add_edge(0, 1, G);
@@ -18,6 +21,9 @@ ActionTest::ActionTest()
     this->rel[0].a_pred.insert(edge(0, 3, G).first);
 }
 
+/**
+ * Tests if insertions undid correctly.
+ */
 void ActionTest::insertTest()
 {
     Insert action(rel[0].a_pred, edge(0, 1, G).first);
@@ -30,6 +36,9 @@ void ActionTest::insertTest()
     std::cout << "[+] insert action test OK!" << std::endl;
 }
 
+/**
+ * Tests if the deletions undid correctly.
+ */
 void ActionTest::deleteTest()
 {
     Delete action(rel[0].a_pred, edge(0, 1, G).first);
@@ -43,6 +52,9 @@ void ActionTest::deleteTest()
     std::cout << "[+] delete action test OK!" << std::endl;
 }
 
+/**
+ * Run the tests in the correct order.
+ */
 void ActionTest::run()
 {
     insertTest();

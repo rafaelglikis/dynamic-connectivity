@@ -6,6 +6,10 @@
 #include "../graph_types/Relatives.h"
 #include "../graph_types/DynamicGraph.h"
 
+/**
+ *  ActionTest
+ *  Tests if Action undo function working properly.
+ */
 class ActionTest : public Test
 {
 private:

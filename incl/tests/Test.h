@@ -2,6 +2,10 @@
 #define TEST_H
 
 
+/**
+ * Abstract Test
+ * Subclasses must implement how run function run
+ */
 class Test
 {
 public:

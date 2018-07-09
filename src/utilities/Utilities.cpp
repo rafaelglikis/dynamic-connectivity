@@ -3,6 +3,13 @@
 #include "../../incl/utilities/Utilities.h"
 #include "../../incl/graph_types/UndirectedGraph.h"
 
+/**
+ * Generates a random Vertex in range.
+ * Seed initialized once.
+ * @param min (minimum Vertex to return)
+ * @param max (maximum Vertex to return)
+ * @return number
+ */
 Vertex Utilities::randomRange(Vertex min, Vertex max)
 {
     static bool first = true;

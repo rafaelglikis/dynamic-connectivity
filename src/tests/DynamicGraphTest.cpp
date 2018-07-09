@@ -2,6 +2,10 @@
 #include "../../incl/tests/DynamicGraphTest.h"
 
 
+/**
+ * Initializing test
+ * Creating test dynamic graph.
+ */
 DynamicGraphTest::DynamicGraphTest()
 {
     add_edge(0, 1, this->G);
@@ -32,6 +36,10 @@ DynamicGraphTest::DynamicGraphTest()
 
 }
 
+/**
+ * Testing dynamic graph initialization.
+ * Tests: level, component, virtual edges
+ */
 void DynamicGraphTest::testInit()
 {
     this->G.init();
@@ -93,6 +101,10 @@ void DynamicGraphTest::testInit()
     std::cout << "[+] test init OK!" << std::endl;
 }
 
+/**
+ * Tests a non break delete.
+ * Tests: level, component, virtual edges
+ */
 void DynamicGraphTest::testNonBreakDelete()
 {
     assert(G.areConnected(16, 17));
@@ -155,6 +167,10 @@ void DynamicGraphTest::testNonBreakDelete()
     std::cout << "[+] test non break delete OK!" << std::endl;
 }
 
+/**
+ * Tests a deletion that breaks a component.
+ * Tests: level, component, virtual edges
+ */
 void DynamicGraphTest::testBreakDelete()
 {
     // are they connected
@@ -222,6 +238,10 @@ void DynamicGraphTest::testBreakDelete()
     std::cout << "[+] test break delete OK!" << std::endl;
 }
 
+/**
+ * Bigger test that covers all circumstances.
+ * Tests: level, component, virtual edges
+ */
 void DynamicGraphTest::testBig()
 {
     G.deleteEdge(4, 5);
@@ -317,6 +337,9 @@ void DynamicGraphTest::testBig()
     std::cout << "[+] big test OK!" << std::endl;
 }
 
+/**
+ * Runs all tests in the correct order.
+ */
 void DynamicGraphTest::run()
 {
     this->testInit();
@@ -325,6 +348,11 @@ void DynamicGraphTest::run()
     this->testBig();
 }
 
+/**
+ * Testing the virtual edges.
+ * Used by other functions.
+ * @param expectedVirtualEdges
+ */
 void DynamicGraphTest::testVirtualEdges(std::list<Edge> &expectedVirtualEdges)
 {
     // test virtual edges

@@ -4,6 +4,13 @@
 #include "../graph_types/DynamicGraph.h"
 #include "Test.h"
 
+/**
+ * Tests DynamicGraph structure with the following tests:
+ *  - init
+ *  - non break delete
+ *  - break delete
+ *  - big test
+ */
 class DynamicGraphTest : public Test
 {
 private:
