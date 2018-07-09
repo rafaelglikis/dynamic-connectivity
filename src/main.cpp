@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "../incl/graph_types/DynamicGraph.h"
 #include "../incl/tests/DynamicGraphTest.h"
-#include "../incl/examples/examples.h"
+#include "../incl/examples/example.h"
 #include "../incl/tests/ActionTest.h"
 #include "../incl/benchmarks/PathBenchmark.h"
 #include "../incl/benchmarks/RandomGraphBenchmark.h"
