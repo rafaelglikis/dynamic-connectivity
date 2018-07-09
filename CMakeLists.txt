@@ -5,8 +5,6 @@ include_directories("/usr/include/LEDA")
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_CXX_FLAGS "-lleda -lX11")
-
 find_package(Boost)
 if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIR})

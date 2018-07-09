@@ -86,10 +86,10 @@ int main(int argc, char* argv[])
 
     if (help || argc < 2) {
         std::cout << "Usage: " << std::endl;
-        std::cout << argv[0] << " ACTION* [OPTION]*" << std::endl;
+        std::cout << "  " << argv[0] << " ACTION* [OPTION]*" << std::endl;
         std::cout << std::endl;
         std::cout << "Example: " << std::endl;
-        std::cout << argv[0] << " benchmark --random -v 500 -e 1000 -d 50 -q 50" << std::endl;
+        std::cout << "  " << argv[0] << " benchmark --random -v 500 -e 1000 -d 50 -q 50" << std::endl;
         std::cout << std::endl;
         std::cout << "Test: " << std::endl;
         std::cout << std::left << std::setw(30) <<"  test " << "run all tests" << std::endl;
