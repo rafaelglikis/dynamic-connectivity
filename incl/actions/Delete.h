@@ -13,7 +13,7 @@ class Delete : public Action
 {
 public:
     Delete(std::set<Edge>&, Edge);
-    void undo() override;
+    void undo();
 };
 
 #endif //DYNAMIC_CONNECTIVITY_DELETEACTION_H

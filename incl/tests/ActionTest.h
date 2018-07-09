@@ -19,7 +19,7 @@ private:
     void deleteTest();
 public:
     ActionTest();
-    void run() override;
+    void run();
 };
 
 

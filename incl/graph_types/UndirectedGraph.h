@@ -1,7 +1,7 @@
 #ifndef DYNAMIC_CONNECTIVITY_GRAPH_H
 #define DYNAMIC_CONNECTIVITY_GRAPH_H
 
-#include <boost/graph/adjacency_list.hpp>
+#include "boost/graph/adjacency_list.hpp"
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
         boost::no_property, boost::no_property, boost::no_property,

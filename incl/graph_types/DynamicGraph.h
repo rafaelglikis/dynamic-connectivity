@@ -19,10 +19,11 @@ private:
     std::vector<unsigned long> components;
     std::vector<unsigned long > level;
     std::set<Edge> virtualEdges;
-    unsigned long nextComponent = 0;
+    unsigned long nextComponent;
+
     std::vector<Relatives> relatives;
-    bool halt = false;
-    bool isInitialized = false;
+    bool halt;
+    bool isInitialized;
 
     // Initialization Operations
     void buildBFSStructure(const Vertex&);
@@ -41,6 +42,7 @@ private:
     void rollBack(std::list<Action*>&, std::list<Vertex>&);
 
 public:
+    DynamicGraph();
     // Operations
     void init();
     bool areConnected(const Vertex&, const Vertex&);

@@ -22,7 +22,7 @@ private:
     void testVirtualEdges(std::list<Edge> &);
 public:
     DynamicGraphTest();
-    void run() override;
+    void run();
 };
 
 #endif //DYNAMIC_CONNECTIVITY_DYNAMICGRAPHTEST_H

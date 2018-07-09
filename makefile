@@ -1,5 +1,5 @@
 CC=g++
-FLAGS=-O3 -fopenmp -std=c++11
+FLAGS=-O3 -fopenmp -std=c++0x
 
 SOURCES=src/main.cpp \
 incl/graph_types/DynamicGraph.h src/graph_types/DynamicGraph.cpp \
@@ -21,8 +21,9 @@ src/examples/example.cpp incl/examples/example.h
 OBJECTS=$(SOURCES:src/%.cpp=build/%.o)
 
 BIN=bin/dc
-INCL='/usr/include/boost'
+INCL='/usr/include/boost/'
 
+#/home/rglykys/CEID/algo-eng/algo-eng-project/boost_1_67_0/boost
 exe: $(BIN)
 
 $(BIN): $(OBJECTS)
@@ -32,7 +33,7 @@ build/%.o: src/%.cpp incl/%.h
 	$(CC) -c $(FLAGS) -I $(INCL) $< -o $@
 
 build/main.o: src/main.cpp
-	$(CC) -c $(FLAGS) -I $(INCL)  $< -o $@
+	$(CC) -c $(FLAGS) -I $(INCL) $< -o $@
 
 clean:
 	rm build/*.o

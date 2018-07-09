@@ -12,10 +12,10 @@ class PathCompleteGraphsBenchmark : public Benchmark
 {
 private:
     std::set<Edge> deletionSet;
-    double getDeletionsTime(unsigned long) override;
+    double getDeletionsTime(unsigned long);
 public:
     explicit PathCompleteGraphsBenchmark(int completeSubgraphs, int vertices);
-    void run(unsigned long, unsigned long) override;
+    void run(unsigned long, unsigned long);
 };
 
 

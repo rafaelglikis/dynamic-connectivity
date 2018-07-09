@@ -11,7 +11,7 @@ class PathBenchmark : public Benchmark
 {
 public:
     explicit PathBenchmark(unsigned long);
-    void run(unsigned long, unsigned long) override;
+    void run(unsigned long, unsigned long);
 };
 
 

@@ -13,7 +13,7 @@ class Insert : public Action
 {
 public:
     Insert(std::set<Edge>&, Edge);
-    void undo() override;
+    void undo();
 };
 
 

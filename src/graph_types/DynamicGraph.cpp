@@ -6,6 +6,13 @@
 #include <sstream>
 #include <omp.h>
 
+DynamicGraph::DynamicGraph() : UndirectedGraph()
+{
+    this->nextComponent = 0;
+    this->halt = false;
+    this->isInitialized = false;
+}
+
 /**
  * Initialization
  * Creation of the first BFS structure starting always from vertex 0.
@@ -490,15 +497,20 @@ void DynamicGraph::rollBack(std::list<Action*> &actions, std::list<Vertex>& incV
 void DynamicGraph::visualize() const
 {
     // Creating components streams
-    std::vector<std::ostringstream> subgraphs(this->nextComponent);
-    for(int i = 0; i<this->nextComponent; ++i) {
-        subgraphs[i] << "  subgraph cluster" << i << " { label = \"Component " << i+1 << "\" ";
+    std::vector<std::string> subgraphs(this->nextComponent);
+    for(unsigned long i = 0; i<this->nextComponent; ++i) {
+        subgraphs[i].append("  subgraph cluster");
+        subgraphs[i].append(std::to_string((long long int)i));
+        subgraphs[i].append(" { label = \"Component ");
+        subgraphs[i].append(std::to_string((long long int)i+1)); 
+        subgraphs[i].append("\" ");
     }
-    for(int i = 0; i<this->components.size(); ++i) {
-        subgraphs[components[i]-1] << i << "; ";
+    for(unsigned long i = 0; i<this->components.size(); ++i) {
+        subgraphs[components[i]-1].append(std::to_string((long long int)i));
+        subgraphs[components[i]-1].append("; ");
     }
-    for(int i = 0; i<this->nextComponent; ++i) {
-        subgraphs[i] << " }\n";
+    for(unsigned long i = 0; i<this->nextComponent; ++i) {
+        subgraphs[i].append(" }\n");
     }
 
     // Printing graph style
@@ -508,8 +520,8 @@ void DynamicGraph::visualize() const
     std::cout << "  edge[style=\"bold\"]" << std::endl;
     std::cout << "  node[shape=\"circle\"]" << std::endl;
     // Print subgraphs by vertices
-    for(int i = 0; i<this->nextComponent; ++i) {
-        std::cout  << subgraphs[i].str();
+    for(unsigned long i = 0; i<this->nextComponent; ++i) {
+        std::cout  << subgraphs[i];
     }
     // Print edges
     EdgeIterator ei, ei_end;

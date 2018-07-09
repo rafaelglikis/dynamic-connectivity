@@ -11,7 +11,7 @@ class TreeBenchmark : public Benchmark
 {
 public:
     explicit TreeBenchmark(unsigned long);
-    void run(unsigned long, unsigned long) override;
+    void run(unsigned long, unsigned long);
 };
 
 
