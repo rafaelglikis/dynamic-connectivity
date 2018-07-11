@@ -54,3 +54,6 @@ fabric.properties
 bin/dc
 build/*/*.o
 *.txt
+*.png
+*.gif
+build/*.o
