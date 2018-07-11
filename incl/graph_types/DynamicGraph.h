@@ -57,6 +57,7 @@ public:
 
     // Printers
     void visualize() const;
+    void visualize(std::ostream&) const;
     void printInfo() const;
 
 };

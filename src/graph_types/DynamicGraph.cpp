@@ -496,13 +496,18 @@ void DynamicGraph::rollBack(std::list<Action*> &actions, std::list<Vertex>& incV
  */
 void DynamicGraph::visualize() const
 {
+    this->visualize(std::cout);
+}
+
+void DynamicGraph::visualize(std::ostream& strm) const
+{
     // Creating components streams
     std::vector<std::string> subgraphs(this->nextComponent);
     for(unsigned long i = 0; i<this->nextComponent; ++i) {
         subgraphs[i].append("  subgraph cluster");
         subgraphs[i].append(std::to_string((long long int)i));
         subgraphs[i].append(" { label = \"Component ");
-        subgraphs[i].append(std::to_string((long long int)i+1)); 
+        subgraphs[i].append(std::to_string((long long int)i+1));
         subgraphs[i].append("\" ");
     }
     for(unsigned long i = 0; i<this->components.size(); ++i) {
@@ -514,14 +519,14 @@ void DynamicGraph::visualize() const
     }
 
     // Printing graph style
-    std::cout << "graph G {" << std::endl;
-    std::cout << "  size=\"5,3\"" << std::endl;
-    std::cout << "  ratio=\"fill\"" << std::endl;
-    std::cout << "  edge[style=\"bold\"]" << std::endl;
-    std::cout << "  node[shape=\"circle\"]" << std::endl;
+    strm << "graph G {" << std::endl;
+    strm << "  size=\"5,3\"" << std::endl;
+    strm << "  ratio=\"fill\"" << std::endl;
+    strm << "  edge[style=\"bold\"]" << std::endl;
+    strm << "  node[shape=\"circle\"]" << std::endl;
     // Print subgraphs by vertices
     for(unsigned long i = 0; i<this->nextComponent; ++i) {
-        std::cout  << subgraphs[i];
+        strm  << subgraphs[i];
     }
     // Print edges
     EdgeIterator ei, ei_end;
@@ -530,14 +535,13 @@ void DynamicGraph::visualize() const
         Edge e = *ei;
         u = source(e, *this);
         v = target(e, *this);
-        std::cout << "  " << u << " -- " << v;
-        if (virtualEdges.count(*ei)) std::cout << " [style=dotted]";
-        std::cout << ";" << std::endl;
+        strm << "  " << u << " -- " << v;
+        if (virtualEdges.count(*ei)) strm << " [style=dotted]";
+        strm << ";" << std::endl;
     }
 
-    std::cout << "}" << std::endl;
+    strm << "}" << std::endl;
 }
-
 
 /**
  * Prints Information about the dynamic graph
@@ -584,6 +588,7 @@ void DynamicGraph::printInfo() const
     }
 }
 
+
 /**
  * Returns the level of the given vertex.
  * @param v vertex
@@ -616,6 +621,8 @@ std::list<Edge> DynamicGraph::getVirtualEdges() const
     }
     return virtualEdgesList;
 }
+
+
 
 
 

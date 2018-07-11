@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include "../../incl/graph_types/DynamicGraph.h"
 
 /**
@@ -35,16 +36,28 @@ void runExample()
     add_edge(18, 19, G);
 
     G.init();
-
-    G.printInfo();
+    std::ofstream file1;
+    file1.open ("1.txt");
+    G.visualize(file1);
     G.visualize();
+    G.printInfo();
+    file1.close();
 
+    G.deleteEdge(12, 13);
+    std::ofstream file2;
+    file2.open("2.txt");
+    G.visualize(file2);
+    G.visualize();
+    G.printInfo();
+    file2.close();
 
     G.deleteEdge(7, 8);
-
-    std::cout << "Graph after deletion: " << std::endl;
-    G.printInfo();
+    std::ofstream file3;
+    file3.open("3.txt");
+    G.visualize(file3);
     G.visualize();
+    G.printInfo();
+    file3.close();
 
     if(G.areConnected(7, 8)) {
         std::cout << "Vertices 7 and 8 are connected!" << std::endl;
@@ -52,4 +65,6 @@ void runExample()
     else {
         std::cout << "Vertices 7 and 8 not are connected!" << std::endl;
     }
+
+
 }

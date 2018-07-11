@@ -1,5 +1,5 @@
 CC=g++
-FLAGS=-O3 -fopenmp -std=c++0x
+FLAGS=-fopenmp -std=c++0x
 
 SOURCES=src/main.cpp \
 incl/graph_types/DynamicGraph.h src/graph_types/DynamicGraph.cpp \
