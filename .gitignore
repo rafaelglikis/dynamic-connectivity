@@ -57,7 +57,8 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
-bin/dc
-build/*.o
-build/*/*.o
+# project
+*.txt
+*.png
+*.gif
 

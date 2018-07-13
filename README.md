@@ -52,6 +52,11 @@ Examples:
 Help:
 
     --help                       produce help message
+
+Visualization:
+
+    dynamic_connectivity --example
+    ./visualize-example.sh
     
 # References
 * [ES81] S. Even and Y. Shiloach, "An On-Line Edge-Deletion Problem", Journal of the ACM, 28(1):1-4, 1981

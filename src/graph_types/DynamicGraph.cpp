@@ -474,6 +474,11 @@ void DynamicGraph::rollBack(std::list<std::unique_ptr<Action>> &actions, std::li
  */
 void DynamicGraph::visualize() const
 {
+    this->visualize(std::cout);
+}
+
+void DynamicGraph::visualize(std::ostream &strm) const
+{
     // Creating components streams
     std::vector<std::ostringstream> subgraphs(this->nextComponent);
     for(int i = 0; i<this->nextComponent; ++i) {
@@ -487,14 +492,14 @@ void DynamicGraph::visualize() const
     }
 
     // Printing graph style
-    std::cout << "graph G {" << std::endl;
-    std::cout << "  size=\"5,3\"" << std::endl;
-    std::cout << "  ratio=\"fill\"" << std::endl;
-    std::cout << "  edge[style=\"bold\"]" << std::endl;
-    std::cout << "  node[shape=\"circle\"]" << std::endl;
+    strm << "graph G {" << std::endl;
+    strm << "  size=\"5,3\"" << std::endl;
+    strm << "  ratio=\"fill\"" << std::endl;
+    strm << "  edge[style=\"bold\"]" << std::endl;
+    strm << "  node[shape=\"circle\"]" << std::endl;
     // Print subgraphs by vertices
     for(int i = 0; i<this->nextComponent; ++i) {
-        std::cout  << subgraphs[i].str();
+        strm  << subgraphs[i].str();
     }
     // Print edges
     EdgeIterator ei, ei_end;
@@ -503,14 +508,13 @@ void DynamicGraph::visualize() const
         Edge e = *ei;
         u = source(e, *this);
         v = target(e, *this);
-        std::cout << "  " << u << " -- " << v;
-        if (virtualEdges.count(*ei)) std::cout << " [style=dotted]";
-        std::cout << ";" << std::endl;
+        strm << "  " << u << " -- " << v;
+        if (virtualEdges.count(*ei)) strm << " [style=dotted]";
+        strm << ";" << std::endl;
     }
 
-    std::cout << "}" << std::endl;
+    strm << "}" << std::endl;
 }
-
 
 
 /**
@@ -590,6 +594,7 @@ std::list<Edge> DynamicGraph::getVirtualEdges() const
     }
     return virtualEdgesList;
 }
+
 
 
 
