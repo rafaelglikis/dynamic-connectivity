@@ -4,9 +4,17 @@ There is given an undirected graph G = (V, E) from which edges are deleted one a
 This is an implementation of a decremental dynamic algorithm [ES81] which maintains a data structure in which each question is answered in constant time and for which the total time involved in answering q questions and maintaining the data structure is O(q+|V|*|E|), and O(q+|E|*log(|E|)) for acyclic graphs.
 
 # Requirements
-    boost graph library
-    openmp
-    cmake
+* boost graph library
+* openmp
+* cmake
+
+# Complile
+    
+    mkdir cmake-build 
+    cd cmake-build 
+    cmake ..
+    cd ..
+    cmake --build cmake-build
 
 # Usage
 
