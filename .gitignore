@@ -52,4 +52,6 @@ fabric.properties
 .idea/httpRequests
 
 bin/dc
+build/*.o
 build/*/*.o
+
