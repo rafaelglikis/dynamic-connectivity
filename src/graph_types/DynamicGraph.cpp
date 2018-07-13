@@ -4,7 +4,6 @@
 #include <iostream>
 #include <algorithm>
 #include <sstream>
-#include <omp.h>
 
 /**
  * Initialization
@@ -57,7 +56,7 @@ void DynamicGraph::buildBFSStructure(const Vertex &s)
  * @param visited (vector with vertex visited status)
  * @param startingLevel (level to start bfs)
  */
-void DynamicGraph::bfs(const Vertex &s, std::vector<bool> &visited, const int startingLevel)
+void DynamicGraph::bfs(const Vertex &s, std::vector<bool> &visited, const unsigned long startingLevel)
 {
     std::list<Vertex> queue;
     this->level[s] = startingLevel;
@@ -292,8 +291,8 @@ bool DynamicGraph::bdbfsStep(std::list<Vertex>& queue, std::vector<bool>& visite
 void DynamicGraph::updateVisitedComponents(const std::list<Vertex>& visited)
 {
     this->nextComponent++;
-    for (auto v = visited.begin(); v != visited.end(); ++v){
-        this->components[*v] = this->nextComponent;
+    for (unsigned long v : visited) {
+        this->components[v] = this->nextComponent;
     }
 }
 
@@ -328,12 +327,11 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
         this->halt = true;
         this->relatives[v].b_sibl.erase(e);
         this->relatives[u].b_sibl.erase(e);
-        return true;
     }
 
     // Case 2: v and u are on different levels
     if (this->level[v]!=this->level[u]) {
-        std::list<Action*> actions; // changes stack
+        std::list<std::unique_ptr<Action>> actions; // changes stack
         std::list<Vertex> incVertices; // vertices dropped stack (each vertex multible times)
         // For Generality u in Li-1 and v Li
         if (this->level[v] < this->level[u]) {
@@ -342,18 +340,14 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
             u = tmp;
         }
 
-        actions.push_front(new Delete(this->relatives[u].c_succ, e));
+        actions.emplace_front(new Delete(this->relatives[u].c_succ, e));
         this->relatives[u].c_succ.erase(e);
-        actions.push_front(new Delete(this->relatives[v].a_pred, e));
+        actions.emplace_front(new Delete(this->relatives[v].a_pred, e));
         this->relatives[v].a_pred.erase(e);
 
         // Case 2.1: a_pred(v) is not empty
         if(!this->relatives[v].a_pred.empty()) {
             this->halt = true;
-            while (!actions.empty()) {
-                delete actions.front();
-                actions.pop_front();
-            }
             return true;
         }
         // Case 2.2 a_pred(v) is empty
@@ -375,15 +369,9 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
                 }
             }
         }
-
-        while (!actions.empty()) {
-            delete actions.front();
-            actions.pop_front();
-        }
-
         this->halt = true;
-        return true;
     }
+    return true;
 }
 
 /**
@@ -398,7 +386,7 @@ bool DynamicGraph::checkComponentNotBreak(Vertex v, Vertex u, Edge e)
  * @param incVertices (vector of vertices that droped level for undo)
  */
 void DynamicGraph::dropLevel(Vertex w, std::list<Vertex> &queue,
-                             std::list<Action *> &actions, std::list<Vertex> &incVertices)
+                             std::list<std::unique_ptr<Action>> &actions, std::list<Vertex> &incVertices)
 {
     // Remove w from its level (say, Lj), and put it in the next level (Lj+1)
     incVertices.push_front(w);
@@ -408,20 +396,20 @@ void DynamicGraph::dropLevel(Vertex w, std::list<Vertex> &queue,
     for(auto ei = relatives[w].b_sibl.begin(); ei != relatives[w].b_sibl.end(); ++ei) {
         Vertex ww = (w==target(*ei, *this)) ? source(*ei, *this) : target(*ei, *this);
         // remove e from b_sibl(w')
-        actions.push_front(new Delete(relatives[ww].b_sibl, *ei));
+        actions.emplace_front(new Delete(relatives[ww].b_sibl, *ei));
         relatives[ww].b_sibl.erase(*ei);
         // and put it in c_succ(w')
-        actions.push_front(new Insert(relatives[ww].c_succ, *ei));
+        actions.emplace_front(new Insert(relatives[ww].c_succ, *ei));
         relatives[ww].c_succ.insert(*ei);
     }
 
     // a_pred(w) <- b_pred(w)
     for(auto ei = relatives[w].a_pred.begin(); ei != relatives[w].a_pred.end(); ++ei) {
-        actions.push_front(new Delete(relatives[w].a_pred, *ei));
+        actions.emplace_front(new Delete(relatives[w].a_pred, *ei));
     }
     relatives[w].a_pred.clear();
     for(auto ei = relatives[w].b_sibl.begin(); ei != relatives[w].b_sibl.end(); ++ei) {
-        actions.push_front(new Insert(relatives[w].a_pred, *ei));
+        actions.emplace_front(new Insert(relatives[w].a_pred, *ei));
         relatives[w].a_pred.insert(*ei);
     }
 
@@ -429,10 +417,10 @@ void DynamicGraph::dropLevel(Vertex w, std::list<Vertex> &queue,
     for(auto ei = relatives[w].c_succ.begin(); ei != relatives[w].c_succ.end(); ++ei) {
         Vertex ww = (w==target(*ei, *this)) ? source(*ei, *this) : target(*ei, *this);
         // remove e from a_pred(w')
-        actions.push_front(new Delete(relatives[ww].a_pred, *ei));
+        actions.emplace_front(new Delete(relatives[ww].a_pred, *ei));
         relatives[ww].a_pred.erase(*ei);
         // and put it in b_sibl(w');
-        actions.push_front(new Insert(relatives[ww].b_sibl, *ei));
+        actions.emplace_front(new Insert(relatives[ww].b_sibl, *ei));
         relatives[ww].b_sibl.insert(*ei);
         // if the new a_pred(w') is empty, put w' on Q.
         if(relatives[ww].a_pred.empty()) {
@@ -442,17 +430,17 @@ void DynamicGraph::dropLevel(Vertex w, std::list<Vertex> &queue,
 
     // b_sibl(w) <- c_succ(w)
     for(auto ei = relatives[w].b_sibl.begin(); ei != relatives[w].b_sibl.end(); ++ei) {
-        actions.push_front(new Delete(relatives[w].b_sibl, *ei));
+        actions.emplace_front(new Delete(relatives[w].b_sibl, *ei));
     }
     relatives[w].b_sibl.clear();
     for(auto ei = relatives[w].c_succ.begin(); ei != relatives[w].c_succ.end(); ++ei) {
-        actions.push_front(new Insert(relatives[w].b_sibl, *ei));
+        actions.emplace_front(new Insert(relatives[w].b_sibl, *ei));
         relatives[w].b_sibl.insert(*ei);
     }
 
     // c_succ(w) <- {empty}
     for(auto ei = relatives[w].c_succ.begin(); ei != relatives[w].c_succ.end(); ++ei) {
-        actions.push_front(new Delete(relatives[w].c_succ, *ei));
+        actions.emplace_front(new Delete(relatives[w].c_succ, *ei));
     }
     relatives[w].c_succ.clear();
 
@@ -467,13 +455,10 @@ void DynamicGraph::dropLevel(Vertex w, std::list<Vertex> &queue,
  * @param actions (insert and delete actions)
  * @param incVertices (vertices dropped)
  */
-void DynamicGraph::rollBack(std::list<Action*> &actions, std::list<Vertex>& incVertices)
+void DynamicGraph::rollBack(std::list<std::unique_ptr<Action>> &actions, std::list<Vertex>& incVertices)
 {
-    while (!actions.empty()) {
-        Action* action = actions.front();
-        actions.pop_front();
-        action->undo();
-        delete action;
+    for (auto &action : actions) {
+        (*action).undo();
     }
 
     while(!incVertices.empty()) {
@@ -527,6 +512,7 @@ void DynamicGraph::visualize() const
 }
 
 
+
 /**
  * Prints Information about the dynamic graph
  */
@@ -537,10 +523,10 @@ void DynamicGraph::printInfo() const
         std::cout << " - component " << this->components[v] << std::endl;
         std::cout << " - level " << this->level[v] << std::endl;
         std::cout << " - pred: ";
-        for (auto ei = this->relatives[v].a_pred.begin(); ei != this->relatives[v].a_pred.end(); ei++) {
-            Vertex u = source(*ei, *this);
-            Vertex v = target(*ei, *this);
-            Edge e = edge(v, u, *this).first;
+        for (const auto &ei : this->relatives[v].a_pred) {
+            Vertex u = source(ei, *this);
+            Vertex w = target(ei, *this);
+            Edge e = edge(w, u, *this).first;
             if(this->virtualEdges.count(e)) {
                 std::cout << "~";
             }
@@ -548,10 +534,10 @@ void DynamicGraph::printInfo() const
         }
         std::cout << std::endl;
         std::cout << " - sibl: ";
-        for (auto ei = this->relatives[v].b_sibl.begin(); ei != this->relatives[v].b_sibl.end(); ei++) {
-            Vertex u = source(*ei, *this);
-            Vertex v = target(*ei, *this);
-            Edge e = edge(v, u, *this).first;
+        for (const auto &ei : this->relatives[v].b_sibl) {
+            Vertex u = source(ei, *this);
+            Vertex w = target(ei, *this);
+            Edge e = edge(w, u, *this).first;
             if(this->virtualEdges.count(e)) {
                 std::cout << "~";
             }
@@ -559,10 +545,10 @@ void DynamicGraph::printInfo() const
         }
         std::cout << std::endl;
         std::cout << " - succ: ";
-        for (auto ei = this->relatives[v].c_succ.begin(); ei != this->relatives[v].c_succ.end(); ei++) {
-            Vertex u = source(*ei, *this);
-            Vertex v = target(*ei, *this);
-            Edge e = edge(v, u, *this).first;
+        for (const auto &ei : this->relatives[v].c_succ) {
+            Vertex u = source(ei, *this);
+            Vertex w = target(ei, *this);
+            Edge e = edge(w, u, *this).first;
             if(this->virtualEdges.count(e)) {
                 std::cout << "~";
             }
@@ -577,7 +563,7 @@ void DynamicGraph::printInfo() const
  * @param v vertex
  * @return level
  */
-int DynamicGraph::getLevel(Vertex v) const
+unsigned long DynamicGraph::getLevel(Vertex v) const
 {
     return this->level[v];
 }
@@ -599,8 +585,8 @@ unsigned long DynamicGraph::getComponent(const Vertex v) const
 std::list<Edge> DynamicGraph::getVirtualEdges() const
 {
     std::list<Edge> virtualEdgesList;
-    for(auto ei = this->virtualEdges.begin(); ei != this->virtualEdges.end(); ++ei) {
-        virtualEdgesList.push_back(*ei);
+    for (const auto &virtualEdge : this->virtualEdges) {
+        virtualEdgesList.push_back(virtualEdge);
     }
     return virtualEdgesList;
 }

@@ -26,7 +26,7 @@ private:
 
     // Initialization Operations
     void buildBFSStructure(const Vertex&);
-    void bfs(const Vertex& , std::vector<bool>&, int);
+    void bfs(const Vertex& , std::vector<bool>&, unsigned long);
 
     void updateRelatives();
     // Deletion operations
@@ -37,8 +37,8 @@ private:
     void updateVisitedComponents(const std::list<Vertex> &);
     bool checkComponentNotBreak(Vertex, Vertex, Edge);
     void dropLevel(Vertex w, std::list<Vertex> &,
-            std::list<Action*> &, std::list<Vertex> &);
-    void rollBack(std::list<Action*>&, std::list<Vertex>&);
+                   std::list<std::unique_ptr<Action>> &, std::list<Vertex> &);
+    void rollBack(std::list<std::unique_ptr<Action>>&, std::list<Vertex>&);
 
 public:
     // Operations
@@ -49,7 +49,7 @@ public:
     void showVirtualEdges();
 
     // getters
-    int getLevel(Vertex v) const;
+    unsigned long getLevel(Vertex v) const;
     unsigned long getComponent(Vertex v) const;
     std::list<Edge> getVirtualEdges() const;
 
