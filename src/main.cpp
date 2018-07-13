@@ -27,14 +27,14 @@ boost::program_options::variables_map parseArguments(int argc, char *const *argv
             ("random", "run benchmark with random graph")
             ("path-complete", "run benchmark with path of complete subgraphs")
             ("vertices,v", boost::program_options::value<unsigned long>(&vertices)
-                    ->default_value(100), "specify number of vertices (default 100)")
+                    ->default_value(100), "specify number of vertices")
             ("edges,e", boost::program_options::value<unsigned long>(&edges)
                      ->default_value(static_cast<const unsigned long &>(100*log(100))),
-             "specify number of edges (default vertices*log(vertices)) (only for random graphs)")
+             "specify number of edges (only for random graphs)")
             ("deletions,d", boost::program_options::value<unsigned long>(&deletions)
-                    ->default_value(50), "specify number of vertices (default 50)")
+                    ->default_value(50), "specify number of deletions")
             ("queries,q", boost::program_options::value<unsigned long>(&queries)
-                    ->default_value(50), "specify number of vertices (default 50)")
+                    ->default_value(50), "specify number of queries (default 50)")
             ("example", "run an example")
             ("help", "produce help message")
             ;

@@ -20,23 +20,31 @@ Example:
 
 Test:
 
-    test                        run all tests
+    --test                       run all tests
 
-Benchmark:
+Benchmarks:
 
-    benchmark                   run benchmark specified benchmarks
-    --path                      run benchmark with path graph
-    --tree                      run benchmark with tree graph
-    --random                    run benchmark with tree graph
-    --path-complete             run benchmark with path of partly complete graphs
+    --benchmark                  run benchmark specified benchmarks
+    --path                       run benchmark with path graph
+    --tree                       run benchmark with tree graph
+    --random                     run benchmark with random graph
+    --path-complete              run benchmark with path of complete subgraphs
 
 Benchmark options:
 
-    -v, --vertices <number>     specify number of vertices (default 10000)
-    -e, --edges <number>        specify number of edges (default 10000*log(10000))
-    -d, --deletions <number>    specify number of deletions (default 5000)
-    -q, --queries <number>      specify number of queries (default 5000)
+    -v [ --vertices ] arg (=100) specify number of vertices
+    -e [ --edges ] arg (=460)    specify number of edges (only for random graphs)
+    -d [ --deletions ] arg (=50) specify number of vertices
+    -q [ --queries ] arg (=50)   specify number of vertices
 
 Examples:
 
-    example                     run an example
+    --example                    run an example
+    
+Help:
+
+    --help                       produce help message
+
+    
+  
+  
