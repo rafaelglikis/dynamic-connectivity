@@ -43,7 +43,7 @@ boost::program_options::variables_map parseArguments(int argc, char *const *argv
     store(parse_command_line(argc, argv, options), vm);
     notify(vm);
 
-    if (vm.count("help")) {
+    if (vm.count("help") || argc < 2) {
         std::cout << options << "\n";
         exit(1);
     }

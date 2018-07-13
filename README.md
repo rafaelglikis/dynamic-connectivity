@@ -1,12 +1,12 @@
-# Introduction
+# Abstract
 There is given an undirected graph G = (V, E) from which edges are deleted one at a time. Questions like "Are the vertices u and v in the same connected component?" have to be answered "on-line".
 
-This is an implementation of an algorithm ([ES81] S. Even and Y. Shiloach, "An On-Line Edge-Deletion Problem", Journal of the ACM, 28(1):1-4, 1981) which maintains a data structure in which each question is answered in constant time and for which the total time involved in answering q questions and maintaining the data structure is O(q+|V|*|E|), and O(q+|E|*log(|E|)) for acyclic graphs.
+This is an implementation of a decremental dynamic algorithm [ES81] which maintains a data structure in which each question is answered in constant time and for which the total time involved in answering q questions and maintaining the data structure is O(q+|V|*|E|), and O(q+|E|*log(|E|)) for acyclic graphs.
 
-# Installation requirements
-    openmp
+# Requirements
     boost graph library
-    linux system?
+    openmp
+    cmake
 
 # Usage
 
@@ -44,6 +44,9 @@ Examples:
 Help:
 
     --help                       produce help message
+    
+# References
+* [ES81] S. Even and Y. Shiloach, "An On-Line Edge-Deletion Problem", Journal of the ACM, 28(1):1-4, 1981
 
     
   
