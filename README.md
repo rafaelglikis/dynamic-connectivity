@@ -8,7 +8,7 @@ This is an implementation of a decremental dynamic algorithm [ES81] which mainta
 * openmp
 * cmake
 
-# Complile
+# Compile
     
     mkdir cmake-build 
     cd cmake-build 
