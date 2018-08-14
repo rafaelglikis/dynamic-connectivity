@@ -69,9 +69,9 @@ Visualization:
 ### Example
 
     #include <iostream>
-    #include "../../incl/graph_types/DynamicGraph.h"
+    #include "../incl/graph_types/DynamicGraph.h"
     
-    void main()
+    int main()
     {
         // Create graph the bgl way
         DynamicGraph G;
