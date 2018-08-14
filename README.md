@@ -9,6 +9,44 @@ This is an implementation of a decremental dynamic algorithm [ES81] which mainta
 * openmp
 * cmake
 
+## How to use it
+
+* Create graph and initialize it
+* Make deletions
+* Make queries
+* Repeat
+
+### Example
+
+    #include <iostream>
+    #include "../incl/graph_types/DynamicGraph.h"
+    
+    int main()
+    {
+        // Create graph the bgl way
+        DynamicGraph G;
+        add_edge(0, 1, G);
+        add_edge(0, 2, G);
+        add_edge(2, 3, G);
+        add_edge(4, 5, G);
+        add_edge(4, 6, G);
+        add_edge(6, 5, G);
+        add_edge(7, 8, G);
+    
+        // Initialize dynamic Graph
+        G.init();
+    
+        // Delete edge
+        G.deleteEdge(7, 8);
+        
+        if(G.areConnected(7, 8)) {
+            std::cout << "Vertices 7 and 8 are connected!" << std::endl;
+        }
+        else {
+            std::cout << "Vertices 7 and 8 not are connected!" << std::endl;
+        }
+    }
+
 ## Compile
     
     mkdir cmake-build 
@@ -59,43 +97,6 @@ Visualization:
     dynamic_connectivity --example
     ./visualize-example.sh
     
-## How to use it
-
-* Create graph and initialize it
-* Make deletions
-* Make queries
-* Repeat
-
-### Example
-
-    #include <iostream>
-    #include "../incl/graph_types/DynamicGraph.h"
-    
-    int main()
-    {
-        // Create graph the bgl way
-        DynamicGraph G;
-        add_edge(0, 1, G);
-        add_edge(0, 2, G);
-        add_edge(2, 3, G);
-        add_edge(4, 5, G);
-        add_edge(4, 6, G);
-        add_edge(6, 5, G);
-        add_edge(7, 8, G);
-    
-        // Initialize dynamic Graph
-        G.init();
-    
-        // Delete edge
-        G.deleteEdge(7, 8);
-        
-        if(G.areConnected(7, 8)) {
-            std::cout << "Vertices 7 and 8 are connected!" << std::endl;
-        }
-        else {
-            std::cout << "Vertices 7 and 8 not are connected!" << std::endl;
-        }
-    }
     
 ## References
 * [ES81] S. Even and Y. Shiloach, "An On-Line Edge-Deletion Problem", Journal of the ACM, 28(1):1-4, 1981
